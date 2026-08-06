@@ -8,11 +8,11 @@ env.bak/
 venv.bak/
 
 # Data - É uma boa prática ignorar dados para não estourar o limite do GitHub e proteger dados sensíveis
-data/raw/*
-data/processed/*
-!data/raw/.gitkeep
-!data/processed/.gitkeep
-*.csv
+#data/raw/*
+#data/processed/*
+#!data/raw/.gitkeep
+#!data/processed/.gitkeep
+#*.csv
 *.tsv
 *.xlsx
 *.parquet
