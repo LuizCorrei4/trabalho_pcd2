@@ -119,30 +119,12 @@
 
 ## Outros pontos importantes
 
-
-
 * Assunto motivador
-
-
 * 3 ou mais fontes de dados
-
-
 * Várias dezenas de variáveis após a agregação das bases
-
-
 * Confrontar as fontes que escolheu com outras fontes associadas ao assunto usando LLM
-
-
 * Justificar fontes qualitativamente
-
-
 * Fazer Estatística Descritiva inicial
-
-
-* No processo:
-
-
+* No processo
 * verificar hipóteses com base em dados
-
-
 * descobrir relações não-óbvias
