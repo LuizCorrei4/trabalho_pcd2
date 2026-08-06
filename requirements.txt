@@ -1,0 +1,26 @@
+# Análise de Dados Básica
+pandas
+numpy
+
+# Visualização de Dados
+matplotlib
+seaborn
+
+# Aprendizado de Máquina e Estatística
+scikit-learn
+xgboost
+statsmodels
+
+# Dados Espaciais e Geográficos
+geopandas
+pysal
+
+# Ambiente de Desenvolvimento e Jupyter
+jupyterlab
+notebook
+ipykernel
+
+# Utilitários Adicionais
+python-dotenv
+openai
+langchain
