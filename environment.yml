@@ -1,0 +1,22 @@
+# Ambiente conda do projeto — etapa de coleta (T-014, T-015).
+#
+# Criar:      conda env create -f environment.yml
+# Ativar:     conda activate pcd2
+# Atualizar:  conda env update -f environment.yml --prune
+#
+# Este arquivo declara exatamente o que foi usado para rodar e validar os
+# coletores. As bibliotecas das etapas seguintes (geopandas, pysal, xgboost,
+# shap, pdfplumber, sidrapy...) estão em `requirements.txt` e devem ser
+# acrescentadas aqui quando as etapas 2-4 começarem — declarar antes de usar
+# só cria conflito de resolução sem benefício.
+#
+# Quem preferir pip continua servido pelo `requirements.txt`.
+name: pcd2
+channels:
+  - defaults
+dependencies:
+  - python=3.12
+  - pandas      # testado com 3.0.5; o código também roda em 2.x
+  - pyarrow     # escrita/leitura de Parquet
+  - requests    # coletores HTTP
+  - pip

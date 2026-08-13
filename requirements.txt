@@ -12,6 +12,10 @@ requests
 requests
 pyarrow
 
+# Coleta de dados (T-014 INMET, T-015 Monitor de Secas)
+requests
+pyarrow  # leitura/escrita dos Parquet de data/interim/
+
 # Visualização de Dados
 matplotlib
 seaborn

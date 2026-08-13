@@ -8,9 +8,16 @@ env.bak/
 venv.bak/
 
 # Data - É uma boa prática ignorar dados para não estourar o limite do GitHub e proteger dados sensíveis
-#data/raw/*
+# data/raw/ é imutável e pesado: só os ZIPs do INMET (T-014) somam ~1,25 GB, e vários
+# passam de 100 MB, que é o limite RÍGIDO por arquivo do GitHub. Nunca versionar.
+# Os coletores recriam as subpastas sozinhos (mkdir parents=True), então não faz falta
+# ter data/raw/inmet/ etc. no git.
+data/raw/*
+!data/raw/.gitkeep
+data/interim/*
+!data/interim/.gitkeep
+*.zip
 #data/processed/*
-#!data/raw/.gitkeep
 #!data/processed/.gitkeep
 #*.csv
 *.tsv
