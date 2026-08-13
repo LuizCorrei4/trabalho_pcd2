@@ -9,6 +9,17 @@ O brasileiro sente no bolso quando a comida encarece, mas a narrativa pública s
 - **O grupo já teve dificuldades sérias com DataSUS** (esquistossomose). Esta proposta evita completamente essa fonte.
 - **Impacto comunicacional altíssimo**: "O que pesa mais no preço da comida — a seca ou o diesel?" é uma pergunta que qualquer pessoa entende.
 
+### Elementos alimentícios da cesta Básica:
+- Arroz (geralmente 5 kg)
+- Feijão (geralmente 1 kg a 4,5 kg)
+- Óleo de soja (900 ml)Açúcar (refinado ou cristal, 1 kg)
+- Café torrado e moído (250 g ou 500 g)
+- Macarrão (espaguete ou parafuso, 500 g)
+- Farinha de mandioca ou de trigo (500 g a 1 kg)
+- Sal refinado iodado (1 kg)
+- Molho ou extrato de tomate (300 g)
+- Fubá (500 g)
+
 ### Fontes de Dados Detalhadas (5 fontes heterogêneas)
 
 | # | Fonte | Tipo | Granularidade | Formato | Acesso |
