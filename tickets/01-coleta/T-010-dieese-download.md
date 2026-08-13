@@ -39,3 +39,7 @@ A variável-alvo do projeto (valor da cesta básica por capital/mês) só existe
 - Anos mais antigos usam padrões de URL diferentes (`analiseCestaBasica{ANOMES}.pdf` sem a pasta do ano). Se o padrão principal der 404, tentar as variantes antes de marcar como falha.
 - Verificar que o conteúdo é PDF de verdade: os primeiros bytes devem ser `%PDF`. Servidor pode devolver 200 com página de erro.
 - Se o download em massa começar a ser bloqueado, aumentar o sleep. Não paralelizar — são só 140 arquivos.
+
+
+
+## DESCOBERTAS 

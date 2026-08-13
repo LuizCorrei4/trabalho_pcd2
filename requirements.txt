@@ -1,10 +1,16 @@
 # Análise de Dados Básica
-pandas
+# pandas 3.x já saiu e muda o dtype de texto (str em vez de object), o que faz
+# `select_dtypes("object")` emitir Pandas4Warning. Fixado no 2.x até o grupo migrar.
+pandas<3
 numpy
 pyarrow
 
 # Coleta (APIs públicas: SIDRA/IBGE, BCB, INMET...)
 requests
+
+# Coleta (APIs do IBGE/SIDRA) e escrita de parquet
+requests
+pyarrow
 
 # Visualização de Dados
 matplotlib
