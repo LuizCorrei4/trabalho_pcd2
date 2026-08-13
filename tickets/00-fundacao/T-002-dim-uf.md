@@ -8,7 +8,7 @@
 | **Depende de** | T-001 |
 | **Bloqueia** | T-011, T-012, T-014, T-015, T-016, T-017, T-020 |
 | **Responsável** | — |
-| **Status** | 🔲 A fazer |
+| **Status** | ✅ Feito |
 
 ## Contexto
 Cada fonte identifica o mesmo lugar de um jeito diferente: o DIEESE escreve `"Belém"`, o INMET dá lat/lon de estação, o SIDRA usa código IBGE `15`, a CONAB usa `PA`. Sem uma tabela canônica que amarre tudo, cada junção vira uma sessão de `str.replace()` e o erro passa despercebido.
@@ -32,23 +32,31 @@ Este ticket é 1 hora de trabalho que destrava todos os outros. Fazer **antes** 
 | `no_dieese` | bool | `True` se está nas 17 capitais da série longa |
 
 ## Tarefas
-- [ ] Buscar UFs: `GET https://servicodados.ibge.gov.br/api/v1/localidades/estados`
-- [ ] Buscar municípios capitais e extrair `cod_ibge_capital`
-- [ ] Preencher lat/lon das capitais (usar a API de malhas do IBGE ou uma constante manual — são só 27 pares)
-- [ ] Criar `capital_norm` com `unicodedata.normalize('NFKD', s).encode('ascii','ignore')` + `.lower().strip()`
-- [ ] Marcar `no_dieese` para as 17 capitais da série histórica longa
-- [ ] Escrever helper reutilizável em `src/tratamento/chaves.py`:
+- [x] Buscar UFs: `GET https://servicodados.ibge.gov.br/api/v1/localidades/estados`
+- [x] Buscar municípios capitais e extrair `cod_ibge_capital`
+- [x] Preencher lat/lon das capitais (usar a API de malhas do IBGE ou uma constante manual — são só 27 pares)
+- [x] Criar `capital_norm` com `unicodedata.normalize('NFKD', s).encode('ascii','ignore')` + `.lower().strip()`
+- [x] Marcar `no_dieese` para as 17 capitais da série histórica longa
+- [x] Escrever helper reutilizável em `src/tratamento/chaves.py`:
   ```python
   def normaliza_nome(s: str) -> str: ...
   def mapear_para_uf(nomes: pd.Series) -> pd.Series: ...   # nome de cidade → sigla_uf
   ```
 
 ## Critérios de aceite
-- [ ] Exatamente 27 linhas, `sigla_uf` única, zero nulos
-- [ ] `mapear_para_uf()` acerta 27/27 num teste com os nomes escritos **com acento, sem acento e em CAIXA ALTA**
-- [ ] `cod_ibge_capital` tem 7 dígitos e seus 2 primeiros batem com `cod_ibge_uf`
+- [x] Exatamente 27 linhas, `sigla_uf` única, zero nulos
+- [x] `mapear_para_uf()` acerta 27/27 num teste com os nomes escritos **com acento, sem acento e em CAIXA ALTA**
+- [x] `cod_ibge_capital` tem 7 dígitos e seus 2 primeiros batem com `cod_ibge_uf`
 
 ## Armadilhas
 - Toda junção geográfica do projeto deve passar por `sigla_uf`, **nunca** por nome de cidade direto.
 - Brasília/DF: o DIEESE às vezes escreve `Brasília` e às vezes `Distrito Federal`. Tratar os dois no mapeamento.
 - Cuidado com `cod_ibge_uf` lido como string com zero à esquerda (`"11"` vs `11`). Fixar o tipo na leitura: `dtype={"cod_ibge_uf": int}`.
+
+## Notas da implementação
+Script: `src/tratamento/00_dim_uf.py` · helper: `src/tratamento/chaves.py`
+
+- **Sempre ler o CSV por `chaves.carrega_dim_uf()`**, nunca com `pd.read_csv` direto — os dtypes já vêm fixados lá (`DTYPES_DIM_UF`).
+- A API de localidades do IBGE **não marca qual município é a capital**. As 27 capitais são constantes no script (`CAPITAIS`), mas o `cod_ibge_capital` é resolvido contra a lista de municípios da própria UF, e cada lat/lon é validada contra o *bounding box* da malha municipal (API v3 de malhas) — isso pega dígito trocado. 27/27 passaram.
+- As **17 capitais do DIEESE** (`no_dieese`) foram conferidas na Tabela 1 do relatório de março/2025, não de memória: SP, RJ, SC, RS, MS, DF, PR, ES, GO, MG, CE, PA, RN, BA, PE, PB, SE. A pesquisa só passou a cobrir as 27 em ago/2025 (ver T-011).
+- `mapear_para_uf()` também aceita sufixo de UF colado (`"Belém/PA"`, `"Belo Horizonte - MG"`) e o par Brasília ≈ Distrito Federal.

@@ -20,7 +20,9 @@ Nada começa antes de existir um lugar previsível para colocar os arquivos. A r
 - [ ] Criar a árvore:
   ```
   data/raw/{dieese,inmet,sidra,conab,bcb,ana}/
-  data/interim/
+  data/interim/ 
+    data/interim/csv
+    data/interim/parquet
   data/processed/
   src/coleta/  src/tratamento/  src/analise/
   notebooks/

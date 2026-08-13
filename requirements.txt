@@ -1,6 +1,10 @@
 # Análise de Dados Básica
 pandas
 numpy
+pyarrow
+
+# Coleta (APIs públicas: SIDRA/IBGE, BCB, INMET...)
+requests
 
 # Visualização de Dados
 matplotlib

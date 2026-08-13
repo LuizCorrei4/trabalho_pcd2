@@ -1,0 +1,28 @@
+sigla_uf,nome_uf,capital,capital_norm,cod_ibge_uf,cod_ibge_capital,lat,lon,regiao,no_dieese
+AC,Acre,Rio Branco,rio branco,12,1200401,-9.9754,-67.8249,Norte,False
+AL,Alagoas,Maceió,maceio,27,2704302,-9.6658,-35.7353,Nordeste,False
+AM,Amazonas,Manaus,manaus,13,1302603,-3.119,-60.0217,Norte,False
+AP,Amapá,Macapá,macapa,16,1600303,0.0389,-51.0664,Norte,False
+BA,Bahia,Salvador,salvador,29,2927408,-12.9777,-38.5016,Nordeste,True
+CE,Ceará,Fortaleza,fortaleza,23,2304400,-3.7319,-38.5267,Nordeste,True
+DF,Distrito Federal,Brasília,brasilia,53,5300108,-15.7939,-47.8828,Centro-Oeste,True
+ES,Espírito Santo,Vitória,vitoria,32,3205309,-20.3155,-40.3128,Sudeste,True
+GO,Goiás,Goiânia,goiania,52,5208707,-16.6869,-49.2648,Centro-Oeste,True
+MA,Maranhão,São Luís,sao luis,21,2111300,-2.5387,-44.2825,Nordeste,False
+MG,Minas Gerais,Belo Horizonte,belo horizonte,31,3106200,-19.9167,-43.9345,Sudeste,True
+MS,Mato Grosso do Sul,Campo Grande,campo grande,50,5002704,-20.4697,-54.6201,Centro-Oeste,True
+MT,Mato Grosso,Cuiabá,cuiaba,51,5103403,-15.6014,-56.0979,Centro-Oeste,False
+PA,Pará,Belém,belem,15,1501402,-1.4558,-48.5039,Norte,True
+PB,Paraíba,João Pessoa,joao pessoa,25,2507507,-7.1195,-34.845,Nordeste,True
+PE,Pernambuco,Recife,recife,26,2611606,-8.0476,-34.877,Nordeste,True
+PI,Piauí,Teresina,teresina,22,2211001,-5.0892,-42.8019,Nordeste,False
+PR,Paraná,Curitiba,curitiba,41,4106902,-25.4284,-49.2733,Sul,True
+RJ,Rio de Janeiro,Rio de Janeiro,rio de janeiro,33,3304557,-22.9068,-43.1729,Sudeste,True
+RN,Rio Grande do Norte,Natal,natal,24,2408102,-5.7945,-35.211,Nordeste,True
+RO,Rondônia,Porto Velho,porto velho,11,1100205,-8.7612,-63.9004,Norte,False
+RR,Roraima,Boa Vista,boa vista,14,1400100,2.8235,-60.6758,Norte,False
+RS,Rio Grande do Sul,Porto Alegre,porto alegre,43,4314902,-30.0346,-51.2177,Sul,True
+SC,Santa Catarina,Florianópolis,florianopolis,42,4205407,-27.5954,-48.548,Sul,True
+SE,Sergipe,Aracaju,aracaju,28,2800308,-10.9472,-37.0731,Nordeste,True
+SP,São Paulo,São Paulo,sao paulo,35,3550308,-23.5505,-46.6333,Sudeste,True
+TO,Tocantins,Palmas,palmas,17,1721000,-10.1689,-48.3317,Norte,False
