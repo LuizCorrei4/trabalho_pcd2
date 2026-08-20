@@ -20,6 +20,7 @@ venv.bak/
 *.tsv
 *.xlsx
 *.json
+data/raw/sidra_ipca/chunks/
 
 # Python
 __pycache__/
@@ -47,3 +48,6 @@ models/*.joblib
 models/*.pt
 models/*.pth
 !models/.gitkeep
+
+# arquivos temporários
+temp/
