@@ -9,9 +9,15 @@ A partir da **raiz do repositório**, com o ambiente `pcd2` ativo:
 ```bash
 python -m src.coleta.inmet.download      # 1. baixa 13 ZIPs (~1,27 GB) -> data/raw/inmet/
 python -m src.coleta.inmet.catalogo      # 2. gera data/interim/catalogo_estacoes.csv
-python -m src.coleta.inmet.agrega_dia    # 3. gera data/interim/clima_estacao_dia.parquet/
-python -m src.coleta.inmet.validar       # 4. confere os critérios de aceite
+python -m src.coleta.inmet.agrega_dia    # 3. hora -> dia  (intermediário, 13 arquivos)
+python -m src.coleta.inmet.agrega_mes    # 4. dia -> mês   (ENTREGA: 1 arquivo só)
+python -m src.coleta.inmet.validar       # 5. confere os critérios de aceite
 ```
+
+A entrega final é o **arquivo único** `data/interim/clima_estacao_mes.parquet`
+(4,7 MB). A tabela diária é etapa intermediária: ela existe porque os índices de
+extremo **precisam** ser calculados no dia, e é sempre reproduzível a partir dos
+ZIPs.
 
 Opções úteis:
 
@@ -116,9 +122,29 @@ do ano seguinte começar.
 | `temp_max` / `temp_min` | máx / mín das colunas horárias de máxima e mínima |
 | `umidade_media` | média da umidade relativa horária |
 | `radiacao_total` | soma da radiação global (`min_count=1`) |
+| `pressao_media_mb` | média da pressão ao nível da **estação** (não reduzida ao nível do mar) |
+| `temp_orvalho_media_c` | média do ponto de orvalho |
+| `umidade_min` / `umidade_max` | mín / máx das colunas horárias de extremo de umidade |
+| `vento_velocidade_media_ms` | média da velocidade horária |
+| `vento_rajada_max_ms` | **pico** de rajada do dia |
 | `horas_validas` | horas com temperatura não nula |
 | `horas_validas_chuva` | horas com precipitação não nula |
 | `horas_registradas` | quantidade de linhas horárias no dia |
+
+As seis grandezas do meio (pressão, orvalho, extremos de umidade e vento) foram
+acrescentadas depois das cinco originais. São exatamente o que falta para calcular
+**evapotranspiração** e, com ela, o *índice de aridez simplificado* previsto na
+[`docs/Proposta.md`](../../../docs/Proposta.md) — que precisa de temperatura,
+umidade, radiação, vento e pressão juntos. Sem elas, aquela variável não sairia
+sem reprocessar 1,27 GB de ZIP de novo.
+
+**`vento_direcao_gr` foi deliberadamente deixada de fora.** Direção é grandeza
+circular: a média aritmética de 350° e 10° dá 180°, que aponta exatamente para o
+lado oposto do correto. Agregar direção exige média vetorial (e um comprimento
+resultante junto, para dizer se a média significa alguma coisa). Como direção do
+vento tem uso marginal neste projeto, ficou fora — em vez de entrar como uma
+coluna silenciosamente errada. Se o T-021 precisar dela, é o cálculo certo que
+tem de ser implementado, não um `mean()`.
 
 Detalhes que não são óbvios:
 
@@ -195,6 +221,65 @@ E 2021 é exatamente o ano da crise hídrica do Centro-Sul, que o T-015 aponta c
 o episódio mais severo da série do Monitor de Secas. Ou seja: **o período de maior
 interesse analítico é o de pior cobertura climática**. A análise desse episódio vai
 depender de imputação, e a incerteza tem de constar no relatório.
+
+## Agregação dia → mês (a entrega final)
+
+`agrega_mes.py` reduz as 2.547.899 linhas diárias a **83.814 linhas
+estação × mês**, num arquivo só de 4,7 MB, cobrindo 701 estações e 151 meses.
+
+### Não é um `resample('M')`
+
+O T-021 é categórico: **os índices de extremo têm de sair do nível diário, antes
+da agregação mensal** — depois são impossíveis de recuperar. `dias_sem_chuva` não
+se deduz de `chuva_mm_mes`: 90 mm num mês podem ser 3 mm em 30 dias ou 90 mm num
+dia só, e para uma safra a diferença é tudo.
+
+Por isso esta etapa varre o diário e guarda, como colunas do mensal, tudo o que
+só existe no dia:
+
+| Coluna | O que é |
+|---|---|
+| `dias_sem_chuva` | dias com menos de 1 mm |
+| `dias_chuva_forte` | dias com mais de 50 mm |
+| `max_dias_secos_seguidos` | **maior sequência de dias secos** — o veranico, que é o que de fato mata lavoura |
+| `dias_calor_extremo` | dias com máxima acima do p90 daquela estação naquele mês-do-ano |
+
+`dias_calor_extremo` usa um limiar **por estação e por mês do calendário**,
+calculado sobre a série inteira: 32 °C é banal em Teresina em novembro e
+excepcional em Curitiba em julho. Um limiar único para o país não mediria nada.
+
+`max_dias_secos_seguidos` **não atravessa a virada do mês**, e um dia sem medição
+**quebra** a sequência — não se pode afirmar que não choveu num dia em que ninguém
+olhou. Essas duas regras estão cobertas por teste.
+
+### Demais colunas
+
+Acumulados e médias: `chuva_mm_mes`, `radiacao_total_mes` (somas);
+`temp_media`, `temp_max_media`, `temp_min_media`, `amplitude_termica_media`,
+`umidade_media`, `pressao_media_mb`, `temp_orvalho_media_c`,
+`vento_velocidade_media_ms` (médias); `temp_max_abs`, `temp_min_abs`,
+`umidade_min_abs`, `vento_rajada_max_ms` (extremos absolutos do mês).
+
+Qualidade: `dias_com_registro`, `dias_validos_chuva`, `dias_validos_temp`,
+`dias_no_mes`, `pct_dias_validos`.
+
+Mês com menos de **70% de dias válidos** vira `NaN` em vez de virar média de meia
+dúzia de dias — mesmo espírito do corte de 18 horas do diário, e aplicado
+separadamente para chuva e para temperatura.
+
+### Sanidade conferida
+
+A sazonalidade dos extremos bate com a realidade física do país:
+
+| UF | `dias_sem_chuva` em julho | `max_dias_secos_seguidos` em julho |
+|---|---|---|
+| MT (Cerrado) | 30 | **29** — seca total |
+| CE (Sertão) | 28 | 20 |
+| AM (Amazônia) | 23 | 12 — muitos dias secos, mas chuva dispersa |
+| RS (Sul) | 23 | 11 — distribuído o ano todo |
+
+E `dias_calor_extremo` dá em média 3,0 dias/mês, ou seja **10% dos dias**, que é
+exatamente o que a definição por p90 tem de produzir.
 
 ## Para quem pegar o T-021
 

@@ -42,14 +42,16 @@ from ... import config
 from . import (
     ENCODING_CSV,
     FAIXA_CHUVA_DIA_MM,
+    FAIXA_PRESSAO_MB,
     FAIXA_TEMPERATURA_C,
     FAIXA_UMIDADE_PCT,
+    FAIXA_VENTO_MS,
     LINHAS_METADADOS,
     MINIMO_HORAS_VALIDAS,
     SENTINELA_AUSENTE,
     SEPARADOR_CSV,
 )
-from .colunas import mapear_colunas_dados, parsear_metadados
+from .colunas import COLUNAS_NUMERICAS_TODAS, mapear_colunas_dados, parsear_metadados
 from .download import anos_padrao, caminho_zip, csvs_do_zip
 
 SAIDA = config.DATA_INTERIM / "clima_estacao_dia.parquet"
@@ -58,7 +60,7 @@ SAIDA = config.DATA_INTERIM / "clima_estacao_dia.parquet"
 # plausíveis. Strings vazias já viram NaN pelo padrão do pandas.
 VALORES_AUSENTES = ["-9999", "-9999.0", "-9999,0", "-9999.00", "-9999,00"]
 
-COLUNAS_NUMERICAS = ("chuva_mm", "temp_c", "temp_max_c", "temp_min_c", "umidade_pct", "radiacao_kjm2")
+COLUNAS_NUMERICAS = COLUNAS_NUMERICAS_TODAS
 
 COLUNAS_SAIDA = [
     "codigo_estacao",
@@ -72,10 +74,27 @@ COLUNAS_SAIDA = [
     "temp_min",
     "umidade_media",
     "radiacao_total",
+    # Grandezas acrescentadas depois: são as que faltavam para calcular
+    # evapotranspiração, e com ela o índice de aridez previsto na Proposta.
+    "pressao_media_mb",
+    "temp_orvalho_media_c",
+    "umidade_min",
+    "umidade_max",
+    "vento_velocidade_media_ms",
+    "vento_rajada_max_ms",
     "horas_validas",
     "horas_validas_chuva",
     "horas_registradas",
 ]
+
+# Cada grandeza é invalidada pela SUA própria contagem de horas válidas, não pela
+# da temperatura: no INMET os sensores falham de forma independente, e é comum um
+# parar enquanto os outros seguem medindo.
+AGREGACOES_MEDIA = {
+    "pressao_media_mb": "pressao_mb",
+    "temp_orvalho_media_c": "temp_orvalho_c",
+    "vento_velocidade_media_ms": "vento_velocidade_ms",
+}
 
 
 def _ler_horario(dados: bytes) -> tuple[pd.DataFrame, dict[str, str]]:
@@ -127,11 +146,20 @@ def _agregar_dia(horario: pd.DataFrame) -> pd.DataFrame:
             "temp_min": grupos["temp_min_c"].min(),
             "umidade_media": grupos["umidade_pct"].mean(),
             "radiacao_total": grupos["radiacao_kjm2"].sum(min_count=1),
+            # Umidade mínima do dia é sinal direto de aridez, e a máxima fecha a
+            # amplitude. Vêm das colunas horárias de extremo, não da horária média.
+            "umidade_min": grupos["umidade_min_pct"].min(),
+            "umidade_max": grupos["umidade_max_pct"].max(),
+            # Rajada é evento extremo: interessa o pico do dia, não a média.
+            "vento_rajada_max_ms": grupos["vento_rajada_ms"].max(),
             "horas_validas": grupos["temp_c"].count(),
             "horas_validas_chuva": grupos["chuva_mm"].count(),
             "horas_registradas": grupos.size(),
         }
     )
+
+    for destino, origem in AGREGACOES_MEDIA.items():
+        diario[destino] = grupos[origem].mean()
 
     # O corte de horas válidas é aplicado por grandeza, não em bloco: chuva e
     # temperatura falham de forma independente no INMET (é comum o pluviômetro
@@ -141,6 +169,19 @@ def _agregar_dia(horario: pd.DataFrame) -> pd.DataFrame:
 
     poucas_chuva = diario["horas_validas_chuva"] < MINIMO_HORAS_VALIDAS
     diario.loc[poucas_chuva, "chuva_mm"] = pd.NA
+
+    # Mesma lógica para as grandezas novas: cada uma responde pela sua contagem.
+    # As contagens não viram coluna para não inflar a tabela em 6 colunas de
+    # controle; o indicador geral de saúde da estação continua sendo
+    # `horas_validas` e `horas_registradas`.
+    for destino, origem in AGREGACOES_MEDIA.items():
+        diario.loc[grupos[origem].count() < MINIMO_HORAS_VALIDAS, destino] = pd.NA
+    for destino, origem in (
+        ("umidade_min", "umidade_min_pct"),
+        ("umidade_max", "umidade_max_pct"),
+        ("vento_rajada_max_ms", "vento_rajada_ms"),
+    ):
+        diario.loc[grupos[origem].count() < MINIMO_HORAS_VALIDAS, destino] = pd.NA
 
     # A radiação é nula à noite por natureza, então não faz sentido exigir 18
     # horas válidas dela; o que se exige é que o dia tenha registro suficiente.
@@ -161,6 +202,12 @@ def _aplicar_faixas(diario: pd.DataFrame, contador: Counter) -> pd.DataFrame:
         "temp_max": FAIXA_TEMPERATURA_C,
         "temp_min": FAIXA_TEMPERATURA_C,
         "umidade_media": FAIXA_UMIDADE_PCT,
+        "temp_orvalho_media_c": FAIXA_TEMPERATURA_C,
+        "umidade_min": FAIXA_UMIDADE_PCT,
+        "umidade_max": FAIXA_UMIDADE_PCT,
+        "pressao_media_mb": FAIXA_PRESSAO_MB,
+        "vento_velocidade_media_ms": FAIXA_VENTO_MS,
+        "vento_rajada_max_ms": FAIXA_VENTO_MS,
     }
     for coluna, (minimo, maximo) in limites.items():
         valores = diario[coluna]

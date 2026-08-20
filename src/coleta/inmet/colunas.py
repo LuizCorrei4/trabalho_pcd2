@@ -18,19 +18,40 @@ from __future__ import annotations
 import re
 import unicodedata
 
-# Ordem importa: o primeiro padrão que casar vence.
+# As 19 colunas de dados do CSV do INMET. Ordem importa: o primeiro padrão que
+# casar vence, então o mais específico vem antes do mais genérico.
 REGRAS_DADOS: tuple[tuple[str, str], ...] = (
     (r"^DATA\b", "data"),
     (r"^HORA\b", "hora"),
     (r"PRECIPITACAO TOTAL", "chuva_mm"),
     (r"RADIACAO GLOBAL", "radiacao_kjm2"),
+    # Pressão: as variantes "MAX./MIN. NA HORA ANT." vêm antes da horária, senão
+    # um padrão genérico de pressão engoliria as três.
+    (r"PRESSAO ATMOSFERICA MAX", "pressao_max_mb"),
+    (r"PRESSAO ATMOSFERICA MIN", "pressao_min_mb"),
+    (r"PRESSAO ATMOSFERICA AO NIVEL", "pressao_mb"),
+    # Orvalho antes das temperaturas do ar: "TEMPERATURA ORVALHO MAX." não pode
+    # ser confundida com "TEMPERATURA MÁXIMA" — são grandezas diferentes, e casar
+    # errado importaria ponto de orvalho como temperatura do ar.
+    (r"TEMPERATURA ORVALHO MAX", "temp_orvalho_max_c"),
+    (r"TEMPERATURA ORVALHO MIN", "temp_orvalho_min_c"),
+    (r"TEMPERATURA DO PONTO DE ORVALHO", "temp_orvalho_c"),
     # "DO AR ... BULBO SECO" separa a temperatura do ar das de orvalho.
     (r"TEMPERATURA DO AR.*BULBO SECO", "temp_c"),
-    # "TEMPERATURA MAXIMA/MINIMA" não colide com "TEMPERATURA ORVALHO MAX./MIN.",
-    # que é outra grandeza e precisa ficar de fora.
     (r"TEMPERATURA MAXIMA", "temp_max_c"),
     (r"TEMPERATURA MINIMA", "temp_min_c"),
+    # Idem para umidade: as extremas da hora anterior antes da horária.
+    (r"UMIDADE REL\.? MAX", "umidade_max_pct"),
+    (r"UMIDADE REL\.? MIN", "umidade_min_pct"),
     (r"UMIDADE RELATIVA DO AR", "umidade_pct"),
+    (r"VENTO, DIRECAO", "vento_direcao_gr"),
+    (r"VENTO, RAJADA", "vento_rajada_ms"),
+    (r"VENTO, VELOCIDADE", "vento_velocidade_ms"),
+)
+
+# Todas as colunas numéricas do arquivo horário.
+COLUNAS_NUMERICAS_TODAS = tuple(
+    destino for _, destino in REGRAS_DADOS if destino not in ("data", "hora")
 )
 
 # Sem estas o dia não é utilizável.

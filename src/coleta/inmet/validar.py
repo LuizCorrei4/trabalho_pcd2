@@ -16,7 +16,14 @@ import argparse
 import pandas as pd
 
 from ... import config, ufs as mod_ufs
-from . import FAIXA_CHUVA_DIA_MM, FAIXA_TEMPERATURA_C, SENTINELA_AUSENTE
+from . import (
+    FAIXA_CHUVA_DIA_MM,
+    FAIXA_PRESSAO_MB,
+    FAIXA_TEMPERATURA_C,
+    FAIXA_UMIDADE_PCT,
+    FAIXA_VENTO_MS,
+    SENTINELA_AUSENTE,
+)
 from .agrega_dia import SAIDA as SAIDA_DIARIA
 from .catalogo import MINIMO_ESTACOES, SAIDA as SAIDA_CATALOGO
 
@@ -179,8 +186,52 @@ def validar(catalogo: pd.DataFrame, diario: pd.DataFrame) -> int:
     invertidas = int((ambas["temp_max"] < ambas["temp_min"]).sum())
     rel.checar("temp_max >= temp_min", invertidas == 0, f"{invertidas} dias invertidos")
 
+    print("\nCritério 3b — faixas das grandezas acrescentadas (pressão, vento, orvalho)")
+    faixas_extras = {
+        "pressao_media_mb": FAIXA_PRESSAO_MB,
+        "temp_orvalho_media_c": FAIXA_TEMPERATURA_C,
+        "umidade_min": FAIXA_UMIDADE_PCT,
+        "umidade_max": FAIXA_UMIDADE_PCT,
+        "vento_velocidade_media_ms": FAIXA_VENTO_MS,
+        "vento_rajada_max_ms": FAIXA_VENTO_MS,
+    }
+    for coluna, (minimo, maximo) in faixas_extras.items():
+        valores = diario[coluna].dropna()
+        dentro = (valores >= minimo) & (valores <= maximo)
+        rel.checar(
+            f"{coluna} em [{minimo:.0f}, {maximo:.0f}]",
+            bool(dentro.all()),
+            f"min={valores.min():.1f} max={valores.max():.1f}",
+        )
+
+    umidades = diario[["umidade_max", "umidade_min"]].dropna()
+    invertidas_umi = int((umidades["umidade_max"] < umidades["umidade_min"]).sum())
+    rel.checar("umidade_max >= umidade_min", invertidas_umi == 0, f"{invertidas_umi} dias invertidos")
+
+    # A rajada é, por definição, o pico instantâneo — não pode ser menor que a
+    # velocidade média do mesmo dia. Pega troca entre as duas colunas na origem.
+    ventos = diario[["vento_rajada_max_ms", "vento_velocidade_media_ms"]].dropna()
+    rajada_menor = int((ventos["vento_rajada_max_ms"] < ventos["vento_velocidade_media_ms"]).sum())
+    rel.checar("vento_rajada_max >= vento_velocidade_media", rajada_menor == 0, f"{rajada_menor} dias invertidos")
+
+    # O ponto de orvalho não pode passar da temperatura do ar: seria umidade
+    # relativa acima de 100%, que é fisicamente impossível.
+    orvalho = diario[["temp_orvalho_media_c", "temp_media"]].dropna()
+    acima = int((orvalho["temp_orvalho_media_c"] > orvalho["temp_media"] + 0.5).sum())
+    rel.checar(
+        "temp_orvalho_media <= temp_media",
+        acima == 0,
+        f"{acima} dias com orvalho acima da temperatura do ar",
+    )
+
     print("\nCritério 4 — nenhum -9999 sobrevivendo como número")
-    numericas = ["chuva_mm", *COLUNAS_TEMPERATURA, "umidade_media", "radiacao_total"]
+    numericas = [
+        "chuva_mm",
+        *COLUNAS_TEMPERATURA,
+        "umidade_media",
+        "radiacao_total",
+        *faixas_extras,
+    ]
     sobreviventes = {c: int((diario[c] == SENTINELA_AUSENTE).sum()) for c in numericas}
     total_sentinela = sum(sobreviventes.values())
     rel.checar(

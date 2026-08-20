@@ -25,3 +25,8 @@ MINIMO_HORAS_VALIDAS = 18
 FAIXA_CHUVA_DIA_MM = (0.0, 500.0)
 FAIXA_TEMPERATURA_C = (-10.0, 50.0)
 FAIXA_UMIDADE_PCT = (0.0, 100.0)
+# Pressão medida ao nível da ESTAÇÃO, não reduzida ao nível do mar: a estação mais
+# alta do país fica perto de 1.900 m, onde a pressão ronda 800 mb. A faixa é larga
+# de propósito, para pegar só sentinela e não achatar estação de altitude.
+FAIXA_PRESSAO_MB = (500.0, 1100.0)
+FAIXA_VENTO_MS = (0.0, 75.0)

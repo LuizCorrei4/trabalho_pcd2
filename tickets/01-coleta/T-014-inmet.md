@@ -27,8 +27,10 @@ Fonte primária de clima. O volume é grande (dado horário de centenas de esta�
 - [x] Montar `catalogo_estacoes.csv` a partir do cabeçalho de cada CSV dentro do ZIP → [`catalogo.py`](../../src/coleta/inmet/catalogo.py). **701 estações**
 - [x] ~~`src/coleta/06_inmet_agrega_dia.py`~~ → [`agrega_dia.py`](../../src/coleta/inmet/agrega_dia.py): lê os CSVs de dentro do ZIP **sem extrair nada pro disco** (`zipfile` + `io.BytesIO`), um ano por vez, um CSV por vez
 - [x] Agregar hora → dia por estação: `chuva_mm` (soma), `temp_min`/`temp_media`/`temp_max`, `umidade_media`, `radiacao_total`, `horas_validas`
+- [x] **Extra ao ticket:** aproveitar as demais colunas do CSV, que já estavam sendo lidas e descartadas — `pressao_media_mb`, `temp_orvalho_media_c`, `umidade_min`/`umidade_max`, `vento_velocidade_media_ms`, `vento_rajada_max_ms`. São exatamente as grandezas que faltam para calcular **evapotranspiração**, e com ela o *índice de aridez simplificado* previsto na `docs/Proposta.md`. Sem isso, aquela variável exigiria reprocessar 1,27 GB de novo
 - [x] Marcar como nulo o dia com `horas_validas < 18` — **aplicado por grandeza, não em bloco**, ver "Decisões" abaixo
-- [x] Salvar em Parquet particionado por ano
+- [x] Salvar em Parquet particionado por ano *(etapa intermediária)*
+- [x] **Extra ao ticket:** `agrega_mes.py` reduz o diário a **estação × mês num arquivo único** (`data/interim/clima_estacao_mes.parquet`, 83.814 linhas, 4,7 MB). Junto vão os índices de extremo calculados **no nível diário** — `dias_sem_chuva`, `dias_chuva_forte`, `max_dias_secos_seguidos` e `dias_calor_extremo` (p90 por estação e mês-do-ano) — que é a exigência não negociável do T-021 e o que torna a tabela diária descartável
 
 > **Nota sobre a organização dos arquivos:** o ticket sugeria
 > `src/coleta/05_inmet_download.py` e `06_inmet_agrega_dia.py`. Ficou um
@@ -143,8 +145,11 @@ sem tocar na página de catálogo do INMET.
 ## Saídas
 `data/interim/catalogo_estacoes.csv` — 701 estações, 27 UFs, zero sem `sigla_uf`.
 
-`data/interim/clima_estacao_dia.parquet/` — um arquivo por ano. Ler tudo com
-`pd.read_parquet(config.DATA_INTERIM / "clima_estacao_dia.parquet")`.
+`data/interim/clima_estacao_mes.parquet` — **entrega final**, arquivo único com
+83.814 linhas estação × mês e 28 colunas, incluindo os índices de extremo.
+
+`data/interim/clima_estacao_dia.parquet/` — intermediária, um arquivo por ano.
+Descartável: reproduzível a partir dos ZIPs.
 
 **Dependência do T-002:** o coletor usa `data/processed/dim_uf.csv` quando existe e
 cai para a API do IBGE enquanto não existe (`src/ufs.py`), então não ficou
