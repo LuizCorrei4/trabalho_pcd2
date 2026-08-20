@@ -12,17 +12,13 @@ venv.bak/
 # passam de 100 MB, que é o limite RÍGIDO por arquivo do GitHub. Nunca versionar.
 # Os coletores recriam as subpastas sozinhos (mkdir parents=True), então não faz falta
 # ter data/raw/inmet/ etc. no git.
-data/raw/*
-!data/raw/.gitkeep
-data/interim/*
-!data/interim/.gitkeep
+
 *.zip
 #data/processed/*
 #!data/processed/.gitkeep
 #*.csv
 *.tsv
 *.xlsx
-*.parquet
 *.json
 
 # Python
