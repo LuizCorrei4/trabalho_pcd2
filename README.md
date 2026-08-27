@@ -23,16 +23,41 @@ Como o projeto será desenvolvido por 5 pessoas ao longo de 4 meses, adotamos um
 * `figures/`: Gráficos exportados e imagens para uso no relatório ou README.
 * `docs/`: Documentação adicional sobre as bases de dados e a metodologia.
 
-### Como rodar um coletor
+### Como rodar os coletores (Orquestrador Unificado)
 
-Sempre a partir da **raiz do repositório**, para os imports de `src.` funcionarem:
+O repositório conta com um **Orquestrador Central e Unificado** (`src/coleta/runner.py`) para baixar, atualizar e auditar todas as bases de dados de forma segura, reprodutível e idempotente:
 
 ```bash
-python -m src.coleta.inmet.download          # e não python src/coleta/inmet/download.py
+# 1. Executar TODOS os coletores na sequência correta (padrão seguro: pula o que já existe)
+python -m src.coleta.runner --all
+
+# 2. Diagnóstico / Auditoria do estado das bases em disco (Dry-Run)
+python -m src.coleta.runner --status
+
+# 3. Executar apenas UMA fonte específica
+python -m src.coleta.runner --fonte ipca      # IPCA Alimentos (16 Áreas Urbanas)
+python -m src.coleta.runner --fonte inmet     # Clima BDMEP (INMET)
+python -m src.coleta.runner --fonte seca      # Monitor de Secas (ANA)
+python -m src.coleta.runner --fonte safra     # Estimativas de Safra (LSPA/PAM)
+python -m src.coleta.runner --fonte bcb       # Variáveis Macroeconômicas (BCB/SGS)
+
+# 4. Executar um SUBCONJUNTO selecionado
+python -m src.coleta.runner --fontes ipca,bcb
+python -m src.coleta.runner --fontes inmet,seca
+
+# 5. Políticas de Sobrescrita Granular (--overwrite)
+python -m src.coleta.runner --all --overwrite skip       # Padrão: pula arquivos completos
+python -m src.coleta.runner --fonte ipca --force         # Força re-download e substituição total
+python -m src.coleta.runner --fonte bcb --backup         # Cria cópia de segurança antes de sobrescrever
+python -m src.coleta.runner --all --interactive          # Pergunta interativamente antes de sobrescrever
 ```
 
-Cada coletor tem um `validar.py` que confere os critérios de aceite do ticket
-correspondente e sai com código 0 ou 1.
+#### Arquitetura de Logging e Auditoria (4 Camadas)
+1. **Console / Terminal:** Resumo em tempo real com tabela visual formatada.
+2. **Log em Disco (DEBUG):** `logs/execucoes/coleta_YYYYMMDD_HHMMSS.log` (rastreabilidade completa de URLs, tempos e exceções).
+3. **Manifesto JSON:** `logs/execucoes/coleta_YYYYMMDD_HHMMSS_manifest.json` (métricas estruturadas de execução por módulo).
+4. **Log Transacional CSV:** `data/raw/{fonte}/_download_log.csv` (histórico atômico por requisição/chunk).
+
 
 ## Configuração Inicial do Ambiente
 

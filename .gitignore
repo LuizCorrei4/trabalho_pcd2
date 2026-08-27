@@ -1,4 +1,4 @@
-# Environments
+# Ambientes virtuais
 .env
 .venv
 env/
@@ -7,22 +7,52 @@ ENV/
 env.bak/
 venv.bak/
 
-# Data - É uma boa prática ignorar dados para não estourar o limite do GitHub e proteger dados sensíveis
-# data/raw/ é imutável e pesado: só os ZIPs do INMET (T-014) somam ~1,25 GB, e vários
-# passam de 100 MB, que é o limite RÍGIDO por arquivo do GitHub. Nunca versionar.
-# Os coletores recriam as subpastas sozinhos (mkdir parents=True), então não faz falta
-# ter data/raw/inmet/ etc. no git.
+# --------------------------------------------------------------------------- #
+# Dados (reproduzíveis via python -m src.coleta.runner --all)                  #
+# --------------------------------------------------------------------------- #
+# Dados brutos, intermediários e descartados são pesados e não devem ser versionados.
+# Os coletores e o orquestrador recriam toda a estrutura automaticamente.
 
+# Arquivos de dados pesados e binários
+*.parquet
 *.zip
-#data/processed/*
-#!data/processed/.gitkeep
-#*.csv
+*.tar.gz
+*.7z
 *.tsv
 *.xlsx
 *.json
+*.txt
+*.csv
+!data/processed/dim_uf.csv
+
+# Estrutura de pastas de dados (ignora conteúdo, preserva .gitkeep e .md)
+data/raw/**
+!data/raw/
+!data/raw/**/
+!data/raw/**/.gitkeep
+!data/raw/**/*.md
+
+data/interim/**
+!data/interim/
+!data/interim/**/
+!data/interim/**/.gitkeep
+!data/interim/**/*.md
+
+data/processed/**
+!data/processed/
+!data/processed/**/
+!data/processed/**/.gitkeep
+!data/processed/dim_uf.csv
+
+data/Dados_descartados/
+
+# Logs transacionais locais e chunks
+*_download_log.csv
 data/raw/sidra_ipca/chunks/
 
-# Python
+# --------------------------------------------------------------------------- #
+# Python & Bytecode                                                           #
+# --------------------------------------------------------------------------- #
 __pycache__/
 *.py[cod]
 *$py.class
@@ -32,30 +62,26 @@ __pycache__/
 .ipynb_checkpoints/
 *.ipynb_checkpoints/
 
-# VSCode / IDEs
+# IDEs & OS
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# OS
 .DS_Store
 
-# Models
-models/*.pkl
-models/*.h5
-models/*.joblib
-models/*.pt
-models/*.pth
+# Modelos treinados (pesados)
+models/*
 !models/.gitkeep
 
-# arquivos temporários
+# Arquivos temporários e scratch
 temp/
+*.tmp
+*.bak
+*.part
 
-# Logs de Execução e Backups (efêmeros, não versionar no Git)
+# --------------------------------------------------------------------------- #
+# Logs de Execução e Backups (efêmeros, não versionar no Git)                 #
+# --------------------------------------------------------------------------- #
 logs/*
 !logs/.gitkeep
 !logs/README.md
-*_download_log.csv
-*.bak
-*.tmp
