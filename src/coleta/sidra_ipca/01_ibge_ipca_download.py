@@ -156,8 +156,13 @@ def processar_e_estruturar_dados(df):
     df_clean = df_clean[df_clean['item'].str.contains(pattern, case=False, na=False)].copy()
     df_clean['item'] = df_clean['item'].str.replace('))', ')', regex=False).str.strip()
 
+    # O SIDRA usa marcadores textuais no lugar do número quando não há publicação.
+    # Só esses marcadores viram NaN — um `.str.replace('-', '')` aqui apagaria
+    # o sinal de menos de todo valor negativo e transformaria deflação em inflação.
+    MARCADORES = ['-', '...', '..', 'X', '']
+    valor_texto = df_clean['valor'].astype(str).str.strip()
     df_clean['valor'] = pd.to_numeric(
-        df_clean['valor'].astype(str).str.replace('...', '', regex=False).str.replace('-', '', regex=False),
+        valor_texto.where(~valor_texto.isin(MARCADORES)),
         errors='coerce'
     )
 
