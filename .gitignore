@@ -51,3 +51,11 @@ models/*.pth
 
 # arquivos temporários
 temp/
+
+# Logs de Execução e Backups (efêmeros, não versionar no Git)
+logs/*
+!logs/.gitkeep
+!logs/README.md
+*_download_log.csv
+*.bak
+*.tmp
