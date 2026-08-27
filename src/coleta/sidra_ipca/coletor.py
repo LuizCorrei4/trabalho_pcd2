@@ -54,32 +54,58 @@ MAPEAMENTO_REGIOES = {
 }
 
 
-def gerar_trimestres(ano_inicio: int, ano_fim: int) -> list[str]:
+def gerar_trimestres(ano_inicio: int, ano_fim: int, mes_inicio: int = 1, mes_fim: int = 12) -> list[str]:
     """Gera códigos trimestrais no formato AAAAMM-AAAAMM para consulta na API."""
     periodos = []
+    trimestres_info = [
+        (1, 3, "01-03"),
+        (4, 6, "04-06"),
+        (7, 9, "07-09"),
+        (10, 12, "10-12"),
+    ]
     for ano in range(ano_inicio, ano_fim + 1):
-        periodos.extend([
-            f"{ano}01-{ano}03",
-            f"{ano}04-{ano}06",
-            f"{ano}07-{ano}09",
-            f"{ano}10-{ano}12"
-        ])
+        for m_ini, m_fim, label in trimestres_info:
+            if ano == ano_inicio and m_fim < mes_inicio:
+                continue
+            if ano == ano_fim and m_ini > mes_fim:
+                continue
+            periodos.append(f"{ano}{label[:2]}-{ano}{label[3:]}")
     return periodos
 
 
 def obter_tabelas_por_periodo(ano_inicio: int = 2006, ano_fim: int = 2026) -> dict[str, list[str]]:
-    """Gera mapa de tabela -> períodos ajustado para o recorte de anos solicitado."""
+    """Gera mapa de tabela -> períodos ajustado para o recorte de anos e limites reais do IBGE.
+    
+    - Tabela 2938: série do IBGE inicia oficialmente em 2006-07 (Q3/2006)
+    - Tabela 7060: série encerra no trimestre corrente publicado
+    """
+    from datetime import datetime
+
+    hoje = datetime.now()
+    ano_atual = hoje.year
+    mes_atual = hoje.month
+
     tabelas_def = {
-        "2938": (2006, 2011),
-        "1419": (2012, 2019),
-        "7060": (2020, 2026),
+        "2938": (2006, 7, 2011, 12),
+        "1419": (2012, 1, 2019, 12),
+        "7060": (2020, 1, ano_atual, mes_atual),
     }
+
     resultado = {}
-    for cod_tab, (ini_tab, fim_tab) in tabelas_def.items():
+    for cod_tab, (ini_tab, mes_ini_tab, fim_tab, mes_fim_tab) in tabelas_def.items():
+        if ano_inicio > fim_tab or ano_fim < ini_tab:
+            continue
+
         ini = max(ano_inicio, ini_tab)
         fim = min(ano_fim, fim_tab)
-        if ini <= fim:
-            resultado[cod_tab] = gerar_trimestres(ini, fim)
+
+        m_ini = mes_ini_tab if ini == ini_tab else 1
+        m_fim = mes_fim_tab if fim == fim_tab else 12
+
+        lista_tri = gerar_trimestres(ini, fim, mes_inicio=m_ini, mes_fim=m_fim)
+        if lista_tri:
+            resultado[cod_tab] = lista_tri
+
     return resultado
 
 
