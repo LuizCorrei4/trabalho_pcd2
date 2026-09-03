@@ -49,6 +49,15 @@ Este documento orienta o palestrante sobre como apresentar a arquitetura analít
 | **`safra_producao_t_*`** | **0%** | Não há nulos. | A grade UF × produto × mês é perfeita. A ausência de cultura virou **0,0 toneladas**, o que é a verdade fática da economia agrícola do estado. | `fillna(0.0)` legítimo aplicado exclusivamente na produção física. |
 | **`clima_*`** | 0,3% | Nenhuma estação da UF atingiu o limiar de 70% de dias com medição válida no mês. | Zero milímetros de chuva simularia uma seca absoluta em um mês em que choveu mas o sensor falhou. | Preservado como `NaN`. |
 
+#### Por que os percentuais têm intervalos tão amplos dentro da mesma família?
+1. **Na Seca (`seca_*`: 34,29 % a 38,17 %):**
+   - **Piso (34,29 % — 716 nulos):** Presente em `seca_severidade_media`, `pct_area_S0plus` a `S4plus` e `meses_consecutivos_S2plus`. Reflete estritamente os meses em que a UF **não era monitorada** pela ANA pré-2020.
+   - **Teto (38,17 % — 797 nulos):** Ocorre em **`seca_severidade_media_area_seca`**. Esta métrica calcula a severidade dividindo pela área em seca. Em **81 meses monitorados**, a UF teve **zero seca** (tempo excelente, chuva abundante). A fração $\frac{0}{0}$ gera `NaN` condicional por definição matemática ($716 + 81 = 797$ nulos)!
+2. **Na Revisão de Safra (`safra_revisao_pct_*`: 8,62 % a 52,68 %):**
+   - A ausência é governada por: $\text{Taxa de Nulos} = \text{Janeiro (8,62 \%)} + \text{Inaptidão Agronômica da UF}$.
+   - **Piso (8,62 % — 180 nulos):** Culturas universais como **milho, feijão e mandioca** (e cana com 9,05%), cultivadas em todas as 16 UFs, que nascem nulas **apenas em janeiro** (primeira estimativa do ano civil, sem base anterior de comparação).
+   - **Teto (52,68 % — 1.100 nulos):** Culturas de clima temperado rigoroso como **trigo** (e batata-inglesa com 49,52%). No Brasil, **metade da amostra (8 UFs: AC, CE, ES, MA, PA, PE, RJ, SE) produz ZERO trigo**. Logo, essas 8 UFs têm 100% de meses nulos na revisão, somando-se aos janeiros dos estados produtores!
+
 ---
 
 ### 3. A Ilustração do Perigo da Seca: A Expansão Territorial da ANA
