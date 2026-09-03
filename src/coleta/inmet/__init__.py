@@ -30,3 +30,19 @@ FAIXA_UMIDADE_PCT = (0.0, 100.0)
 # de propósito, para pegar só sentinela e não achatar estação de altitude.
 FAIXA_PRESSAO_MB = (500.0, 1100.0)
 FAIXA_VENTO_MS = (0.0, 75.0)
+
+from .coletor import executar_coleta
+
+__all__ = [
+    "SENTINELA_AUSENTE",
+    "ENCODING_CSV",
+    "SEPARADOR_CSV",
+    "LINHAS_METADADOS",
+    "MINIMO_HORAS_VALIDAS",
+    "FAIXA_CHUVA_DIA_MM",
+    "FAIXA_TEMPERATURA_C",
+    "FAIXA_UMIDADE_PCT",
+    "FAIXA_PRESSAO_MB",
+    "FAIXA_VENTO_MS",
+    "executar_coleta",
+]
