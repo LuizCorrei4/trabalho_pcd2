@@ -2,26 +2,39 @@
 
 Este repositório contém a organização inicial e os códigos a serem desenvolvidos para o trabalho da disciplina, focando no cruzamento de dados heterogêneos para estudos sobre **crises climáticas e alimentares no cenário brasileiro**.
 
+## 📚 Central de Documentação do Projeto
+
+Para navegar com clareza pelo repositório, consulte os guias especializados:
+
+| Documento | Público / Objetivo | O que você encontrará |
+|---|---|---|
+| 🛠️ [**Guia do Desenvolvedor & Arquitetura**](docs/guia_do_desenvolvedor.md) | Desenvolvedores e Revisores | Ciclo de vida dos dados, sistema de logging em 4 camadas, backups com rollback, contratos e como adicionar coletores. |
+| 📡 [**Pacote de Coleta e Ingestão**](src/coleta/README.md) | Engenharia de Dados | Detalhes das 6 fontes (IPCA, INMET, Seca, Safra, BCB, Combustíveis), endpoints e granularidades. |
+| 🧪 [**Pacote de Tratamento e Junção**](src/tratamento/README.md) | Ciência de Dados & Modelagem | Regras de agregação (mediana climática, ponderação por postos) e construção da tabela fato final. |
+| 📋 [**Board de Tickets e Backlog**](tickets/README.md) | Toda a Equipe | Critérios de aceite, cronograma, dependências e status de cada tarefa (T-001 a T-051). |
+| 📊 [**Dicionários de Variáveis**](outputs/tabelas/) | Modelagem & Estatística | Dicionários descritivos com unidade, fonte, granularidade nativa e % de nulos de cada coluna. |
+
+---
+
 ## Estrutura do Repositório
 
-Como o projeto será desenvolvido por 5 pessoas ao longo de 4 meses, adotamos uma organização de pastas escalável e profissional:
+Como o projeto é desenvolvido por 5 pessoas ao longo de 4 meses, adotamos uma organização escalável e profissional:
 
 * `data/`: Diretório para os conjuntos de dados (Ignorado pelo Git, exceto estrutura).
-  * `raw/`: Dados brutos, como baixados da fonte. **NUNCA modifique estes arquivos**. Só os ZIPs do INMET somam ~1,27 GB, então esta pasta nunca vai para o Git.
+  * `raw/`: Dados brutos, como baixados da fonte. **NUNCA modifique estes arquivos**.
   * `interim/`: Tabelas intermediárias produzidas pelos coletores (Parquet/CSV), antes da junção final.
-  * `processed/`: Dados limpos e preparados que serão usados nos modelos.
-* `notebooks/`: Jupyter Notebooks (.ipynb) utilizados para exploração de dados, prototipagem e experimentação. Sugere-se nomear de forma sequencial, ex: `01_nome_analise_descritiva.ipynb`.
-* `src/`: Scripts Python modulares e reutilizáveis. Organização:
-  * `config.py`: **todos** os caminhos e constantes do projeto saem daqui — nenhum caminho absoluto espalhado pelo código.
-  * `rede.py`: utilitários HTTP compartilhados (User-Agent, retentativa, download atômico).
-  * `ufs.py`: tabela de UFs; usa o `dim_uf.csv` do T-002 quando existe e cai para a API do IBGE enquanto não existe.
-  * `coleta/<fonte>/`: um subpacote por fonte de dados, cada um com seu `README.md`. Ver [`coleta/inmet/`](src/coleta/inmet/) e [`coleta/monitor_secas/`](src/coleta/monitor_secas/).
+  * `processed/`: Dados limpos e preparados que serão usados nos modelos (dim_uf e tabelas fatos).
+* `notebooks/`: Jupyter Notebooks (.ipynb) utilizados para exploração de dados e prototipagem.
+* `src/`: Scripts Python modulares e reutilizáveis:
+  * `config.py`: **todos** os caminhos e constantes do projeto saem daqui — nenhum caminho absoluto espalhado.
+  * `logging_config.py`: motor de auditoria em 4 camadas e gestão de backups com rollback automático.
+  * `rede.py`: utilitários HTTP compartilhados (User-Agent, retentativas exponenciais).
+  * `ufs.py`: tabela de UFs canônica baseada no `dim_uf.csv`.
+  * `coleta/`: orquestrador CLI (`runner.py`) e submódulos das 6 fontes de dados. Ver [`src/coleta/README.md`](src/coleta/README.md).
+  * `tratamento/`: orquestrador de junção e pipelines de agregação espacial e fatos. Ver [`src/tratamento/README.md`](src/tratamento/README.md).
 * `outputs/`: Tabelas (`tabelas/`) e figuras (`figuras/`) geradas por script.
-* `tickets/`: Backlog do projeto, um arquivo por tarefa. Comece pelo [board](tickets/README.md).
-* `models/`: Modelos treinados salvos (ex: `.pkl`, `.joblib`).
-* `reports/`: Relatórios finais, apresentações e análises.
-* `figures/`: Gráficos exportados e imagens para uso no relatório ou README.
-* `docs/`: Documentação adicional sobre as bases de dados e a metodologia.
+* `tickets/`: Backlog do projeto. Comece pelo [board](tickets/README.md).
+* `docs/`: Documentação sobre as bases de dados, proposta e metodologia.
 
 ### Como rodar os coletores (Orquestrador Unificado)
 
