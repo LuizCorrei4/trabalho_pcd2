@@ -23,6 +23,58 @@ from ..base import ColetaResult
 
 CAMINHO_RAW = config.DATA_RAW / "combustiveis" / "combustivel.csv"
 DESTINO_INTERIM = config.DATA_INTERIM / "combustiveis_uf_mes.parquet"
+URL_RAW_GITHUB = (
+    "https://raw.githubusercontent.com/LuizCorrei4/trabalho_pcd2/"
+    "b764ffb09819e3e0cfa20773f1095ecfb7a84447/data/raw/combustiveis/combustivel.csv"
+)
+
+
+def obter_combustivel_raw(logger: logging.Logger) -> bool:
+    """Garante que o arquivo bruto combustivel.csv esteja disponível localmente.
+
+    Tenta restaurar do repositório Git local primeiro (sem tráfego de rede) e,
+    caso não esteja disponível, faz o download via HTTP do repositório remoto.
+    """
+    if CAMINHO_RAW.exists() and CAMINHO_RAW.stat().st_size > 1000:
+        return True
+
+    CAMINHO_RAW.parent.mkdir(parents=True, exist_ok=True)
+
+    # 1. Tenta restaurar do histórico do Git local (instantâneo)
+    try:
+        import subprocess
+
+        res = subprocess.run(
+            ["git", "checkout", "b764ffb09819e3e0cfa20773f1095ecfb7a84447", "--", str(CAMINHO_RAW)],
+            capture_output=True,
+            text=True,
+            check=False,
+            cwd=str(config.RAIZ),
+        )
+        if res.returncode == 0 and CAMINHO_RAW.exists():
+            subprocess.run(
+                ["git", "reset", "HEAD", str(CAMINHO_RAW)],
+                capture_output=True,
+                cwd=str(config.RAIZ),
+            )
+            logger.info("Arquivo combustivel.csv restaurado com sucesso do repositório local.")
+            return True
+    except Exception as e:
+        logger.debug(f"Falha na restauração via Git local: {e}")
+
+    # 2. Download via HTTP
+    try:
+        logger.info(f"Baixando base de combustíveis da ANP ({URL_RAW_GITHUB})...")
+        import requests
+
+        resp = requests.get(URL_RAW_GITHUB, timeout=30)
+        resp.raise_for_status()
+        CAMINHO_RAW.write_bytes(resp.content)
+        logger.info(f"Download concluído: {len(resp.content) / 1e6:.2f} MB salvos em {CAMINHO_RAW.name}.")
+        return True
+    except Exception as e:
+        logger.error(f"Erro ao baixar {CAMINHO_RAW.name}: {e}")
+        return False
 
 
 def executar_coleta(
@@ -44,9 +96,9 @@ def executar_coleta(
         interativo: Se True, pergunta confirmação antes de sobrescrever.
 
     Returns:
-        ColetaResult com métricas e metadados da execução.
+        ColetaResult com status e métricas da execução.
     """
-    log = logger or get_logger("combustiveis")
+    log = logger or get_logger("coleta.combustiveis")
     t_inicio = time.perf_counter()
 
     dl_logger = download_logger or DownloadLogger(config.DATA_RAW / "combustiveis")
@@ -90,10 +142,11 @@ def executar_coleta(
         except Exception as e:
             log.warning(f"Arquivo existente ilegível ({e}). Reprocessando...")
 
-    # Verifica se o arquivo bruto da ANP existe
-    if not CAMINHO_RAW.exists():
+    # Garante que o arquivo bruto exista localmente (restaura ou baixa)
+    sucesso_raw = obter_combustivel_raw(log)
+    if not sucesso_raw:
         duracao = time.perf_counter() - t_inicio
-        msg = f"Arquivo bruto não encontrado em: {CAMINHO_RAW}"
+        msg = f"Arquivo bruto não encontrado e não pôde ser baixado: {CAMINHO_RAW}"
         log.error(msg)
         return ColetaResult(
             fonte="combustiveis",
