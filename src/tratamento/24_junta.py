@@ -219,7 +219,10 @@ def prepara_seca() -> pd.DataFrame:
 
 def prepara_macro() -> pd.DataFrame:
     """Série nacional: junta só por `ano_mes` e se repete em todas as UFs."""
-    df = padroniza_chaves(pd.read_parquet(INTERIM / "parquet" / "macro_br_mes.parquet"))
+    caminho_macro = INTERIM / "macro_br_mes.parquet"
+    if not caminho_macro.exists():
+        caminho_macro = INTERIM / "parquet" / "macro_br_mes.parquet"
+    df = padroniza_chaves(pd.read_parquet(caminho_macro))
     df = df[["ano_mes", *COLUNAS_MACRO]].astype({c: "float64" for c in COLUNAS_MACRO})
     return df.rename(columns={c: f"macro_{c}" for c in COLUNAS_MACRO})
 

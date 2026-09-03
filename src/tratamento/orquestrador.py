@@ -79,7 +79,6 @@ def executar_pipeline_tratamento(
             if not origem_clima.exists():
                 raise FileNotFoundError(f"Arquivo de entrada não encontrado: {origem_clima}")
 
-            from . import importlib
             import importlib
             mod_clima = importlib.import_module("src.tratamento.21_clima_uf_mes")
             
