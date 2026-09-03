@@ -743,4 +743,4 @@ python src/tratamento/25_combustiveis.py                 # + ANP → fato final 
 
 **Notebooks que mostram o raciocínio:** `06_juncao_uf_mes.ipynb` (as duas armadilhas do merge,
 célula a célula) e `07_juncao_combustiveis.ipynb` (a terceira armadilha e a validação por
-testemunha). O desenho da junção está em `docs/analise_juncao_uf_mes.md`.
+testemunha). O desenho da junção está em `docs/analises/analise_juncao_uf_mes.md`.

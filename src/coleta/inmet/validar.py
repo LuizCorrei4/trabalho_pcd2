@@ -35,7 +35,7 @@ COLUNAS_TEMPERATURA = ("temp_media", "temp_max", "temp_min")
 
 
 TABELA_COBERTURA = config.OUT_TABELAS / "inmet_cobertura_uf_ano.csv"
-DOC_COBERTURA = config.DOCS / "cobertura_inmet.md"
+DOC_COBERTURA = config.DOCS / "analises" / "cobertura_inmet.md"
 
 
 def _exportar_cobertura(na_janela: pd.DataFrame, cobertura: pd.Series) -> None:

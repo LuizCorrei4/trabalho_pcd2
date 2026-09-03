@@ -125,7 +125,7 @@ O Monitor nasceu no Nordeste em 2014 e foi expandindo. Na janela do projeto:
 
 Essas 1.358 linhas são `NaN`. Preenchê-las com zero ensinaria ao modelo que "não
 havia seca no Sul antes de 2020", o que é falso — ninguém estava medindo. A
-tabela completa está em [`docs/cobertura_monitor_secas.md`](../../../docs/cobertura_monitor_secas.md),
+tabela completa está em [`docs/analises/cobertura_monitor_secas.md`](../../../docs/analises/cobertura_monitor_secas.md),
 gerada automaticamente.
 
 Há também **1 buraco interno** (SE, um mês faltando dentro do intervalo já

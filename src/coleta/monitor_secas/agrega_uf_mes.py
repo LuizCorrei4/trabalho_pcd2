@@ -31,7 +31,7 @@ from . import CATEGORIAS, PESOS, PONTOS_BASE
 from .download import caminho_bruto
 
 SAIDA = config.DATA_INTERIM / "seca_uf_mes.parquet"
-DOC_COBERTURA = config.DOCS / "cobertura_monitor_secas.md"
+DOC_COBERTURA = config.DOCS / "analises" / "cobertura_monitor_secas.md"
 TABELA_COBERTURA = config.OUT_TABELAS / "cobertura_monitor_secas.csv"
 TABELA_QUALIDADE = config.OUT_TABELAS / "monitor_secas_revisoes_divergentes.csv"
 

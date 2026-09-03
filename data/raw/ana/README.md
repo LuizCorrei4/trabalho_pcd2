@@ -101,7 +101,7 @@ MA em 2014-11 tem `S3=0` com `S4=13` — impossível sob categorias cumulativas
 Até 2018 a série tem **apenas Nordeste**. Um modelo treinado sem cuidado vai
 confundir "seca" com "ser do Nordeste". Os meses pré-monitoramento são `NaN`,
 **nunca zero** — 1.358 das 3.726 linhas da saída. Tabela completa em
-[`docs/cobertura_monitor_secas.md`](../../../docs/cobertura_monitor_secas.md).
+[`docs/analises/cobertura_monitor_secas.md`](../../../docs/analises/cobertura_monitor_secas.md).
 
 ## O que foi gerado a partir daqui
 

@@ -1,7 +1,7 @@
 # Análise: como juntar as 4 bases de `data/interim/` numa tabela UF × mês
 
-> Documento de desenho da junção. Cobre os tickets [T-020](../tickets/02-tratamento/T-020-padronizacao.md),
-> [T-021](../tickets/02-tratamento/T-021-clima-uf-mes.md) e [T-024](../tickets/02-tratamento/T-024-juncao-final.md).
+> Documento de desenho da junção. Cobre os tickets [T-020](../../tickets/02-tratamento/T-020-padronizacao.md),
+> [T-021](../../tickets/02-tratamento/T-021-clima-uf-mes.md) e [T-024](../../tickets/02-tratamento/T-024-juncao-final.md).
 > Todos os números aqui foram medidos nos arquivos reais, não estimados.
 
 ## Contexto
@@ -34,7 +34,7 @@ macro. Depois disso nenhum notebook lê `interim/`.
 | Decisão | Escolha | Motivo |
 |---|---|---|
 | Grão final | **UF × mês (largo)** | É o que T-024 especifica e o que os modelos de T-041 esperam |
-| Recorte temporal | **2015-01 → 2026-06** (138 meses) | Interseção das 4 bases; bate com `PERIODO_INICIO/FIM` de [`src/config.py`](../src/config.py) |
+| Recorte temporal | **2015-01 → 2026-06** (138 meses) | Interseção das 4 bases; bate com `PERIODO_INICIO/FIM` de [`src/config.py`](../../src/config.py) |
 | Recorte espacial | **16 UFs** (as do IPCA) | O alvo só existe para elas; são subconjunto estrito das 27 das outras três |
 | Clima estação → UF | **Mediana entre estações** (T-021) | Robusta a estação com defeito; cobertura 100 % das linhas |
 | Bug do sinal do IPCA | **Corrigir e re-coletar antes de juntar** | Sem isso o alvo está corrompido |
@@ -46,7 +46,7 @@ macro. Depois disso nenhum notebook lê `interim/`.
 Verificado no arquivo atual: `IPCA - Variação mensal` tem **mínimo 0,0, zero valores negativos e
 média 3,14 %/mês** (≈45 %/ano composto). Toda deflação virou inflação.
 
-A causa está em [`src/coleta/sidra_ipca/01_ibge_ipca_download.py`](../src/coleta/sidra_ipca/01_ibge_ipca_download.py),
+A causa está em [`src/coleta/sidra_ipca/01_ibge_ipca_download.py`](../../src/coleta/sidra_ipca/01_ibge_ipca_download.py),
 linhas 159-162: o `.str.replace('-', '')` foi escrito para remover o marcador `-` ("não publicado")
 do SIDRA, mas apaga **o sinal de menos de todo valor negativo**.
 
@@ -83,7 +83,7 @@ cai para a ordem de 0,4–0,6 %/mês.
 
 ## Passo 1 — Contrato de chaves (T-020)
 
-Já existe [`src/tratamento/T-012_T-013/chaves.py`](../src/tratamento/T-012_T-013/chaves.py) com
+Já existe [`src/tratamento/T-012_T-013/chaves.py`](../../src/tratamento/T-012_T-013/chaves.py) com
 `normaliza_nome()`, `mapear_para_uf()` e `carrega_dim_uf()` — **reusar, não recriar**. Note que o
 docstring do próprio módulo importa de `src.tratamento.chaves` (sem a subpasta): mover o arquivo
 para `src/tratamento/chaves.py` resolve a inconsistência e é o caminho que o T-020 pede.
@@ -116,7 +116,7 @@ incompatíveis é a armadilha central deste ticket, e `safra_uf_mes` é justamen
 
 `data/processed/calendario_uf_mes.parquet` = produto cartesiano
 `dim_uf × period_range(2015-01, 2026-06)` = **27 × 138 = 3.726 linhas** (entregável do T-020, usa
-[`data/processed/dim_uf.csv`](../data/processed/dim_uf.csv)).
+[`data/processed/dim_uf.csv`](../../data/processed/dim_uf.csv)).
 
 A junção parte dele com **LEFT JOIN sempre, nunca INNER**. As 11 UFs sem IPCA e os meses sem alvo
 caem só no filtro final — assim a perda é contabilizada, não silenciosa.

@@ -5,6 +5,8 @@
 > apresentador. Os detalhes finos (contagens por fonte, tabelas de sujeira, comandos de reprodução)
 > ficam no roteiro completo, para perguntas da banca.
 
+> 📚 **Material de Aprofundamento para o Palestrante:** Cada slide deste roteiro está conectado aos guias técnicos da pasta [`docs/preparacao_palestrante/`](preparacao_palestrante/README.md), contendo referências de código (`src/`), justificativas matemáticas, decisões de engenharia e respostas para perguntas difíceis da banca.
+
 ---
 
 ## Slide 1 — Capa
@@ -21,6 +23,8 @@ multifatorial e varia por região. Para responder isso é preciso colocar clima,
 macroeconomia e custo logístico na *mesma linha da mesma tabela*. Esta apresentação é sobre como essa
 linha foi construída.
 
+👉 **Defesa Técnica da Implementação:** [Módulo 1 — Fundamentos e Escopo](preparacao_palestrante/01_slides_01_a_04_fundamentos_e_arquitetura.md#slide-1--capa-o-que-realmente-move-o-preço-da-comida-no-brasil)
+
 ---
 
 ## Slide 2 — A pergunta e o desenho da tabela
@@ -35,6 +39,8 @@ linha foi construída.
 **Notas:** essa é a decisão estruturante do projeto. Nenhuma fonte conversa com as outras do jeito que
 vem do disco. Tudo teve de ser reduzido a `UF × mês` antes de qualquer merge — e é essa redução que
 consome a maior parte do trabalho.
+
+👉 **Defesa Técnica da Implementação:** [Módulo 1 — Pergunta e Desenho da Tabela](preparacao_palestrante/01_slides_01_a_04_fundamentos_e_arquitetura.md#slide-2--a-pergunta-e-o-desenho-da-tabela)
 
 ---
 
@@ -56,6 +62,8 @@ consome a maior parte do trabalho.
 ao consumidor em área urbana, o LSPA estima safra por estado. Metodologia, grão e periodicidade não têm
 nada em comum.
 
+👉 **Defesa Técnica da Implementação:** [Módulo 1 — As Seis Fontes Heterogêneas](preparacao_palestrante/01_slides_01_a_04_fundamentos_e_arquitetura.md#slide-3--as-seis-fontes-de-dados)
+
 ---
 
 ## Slide 4 — O pipeline em três camadas
@@ -74,6 +82,8 @@ NUNCA modificado      já em UF × mês          pronta para modelar
 **Notas:** a separação raw/interim/processed é o que torna o trabalho reprodutível. Um erro descoberto
 no tratamento nunca exige rebaixar o dado bruto — ele está intacto no disco. O próximo slide mostra o
 que acontece quando essa regra é quebrada.
+
+👉 **Defesa Técnica da Implementação:** [Módulo 1 — Pipeline em Três Camadas](preparacao_palestrante/01_slides_01_a_04_fundamentos_e_arquitetura.md#slide-4--o-pipeline-em-três-camadas)
 
 ---
 
@@ -98,6 +108,8 @@ que acontece quando essa regra é quebrada.
 **Notas:** o fio condutor da apresentação é este. Nenhum desses erros trava a execução — todos produzem
 um número plausível e errado. O trabalho não foi rodar o código, foi descobrir onde ele mentia.
 
+👉 **Defesa Técnica da Implementação:** [Módulo 2 — Erros Silenciosos e o Bloqueador](preparacao_palestrante/02_slides_05_a_07_erros_silenciosos_e_contrato_chaves.md#slide-5--erros-que-não-levantam-exceção-nenhuma)
+
 ---
 
 ## Slide 6 — As três armadilhas da junção
@@ -117,6 +129,8 @@ qualquer regressão.
 
 **Notas:** a terceira é a mais traiçoeira, porque nenhuma verificação de merge a detecta: o merge está
 certo, o número é que é mentira.
+
+👉 **Defesa Técnica da Implementação:** [Módulo 2 — As Três Armadilhas da Junção](preparacao_palestrante/02_slides_05_a_07_erros_silenciosos_e_contrato_chaves.md#slide-6--as-três-armadilhas-da-junção)
 
 ---
 
@@ -139,6 +153,8 @@ Um módulo único que toda fonte é obrigada a atravessar antes de entrar num me
 **Notas:** essas funções foram escritas *depois* de as armadilhas terem sido demonstradas em notebook,
 célula por célula. Elas existem para transformar erro silencioso em erro alto.
 
+👉 **Defesa Técnica da Implementação:** [Módulo 2 — O Contrato de Chaves (chaves.py)](preparacao_palestrante/02_slides_05_a_07_erros_silenciosos_e_contrato_chaves.md#slide-7--o-contrato-de-chaves-que-fecha-as-três-portas)
+
 ---
 
 ## Slide 8 — Cada fonte reduzida ao grão comum
@@ -160,6 +176,8 @@ célula por célula. Elas existem para transformar erro silencioso em erro alto.
 qual a maior sequência seca — precisam sair do nível diário. Depois que o mês virou um total, eles são
 impossíveis de recuperar: 90 mm podem ser 3 mm em 30 dias ou 90 mm num dia só, e para uma safra a
 diferença é tudo.
+
+👉 **Defesa Técnica da Implementação:** [Módulo 3 — Redução de Cada Fonte ao Grão Comum](preparacao_palestrante/03_slides_08_a_10_reducao_juncao_e_combustiveis.md#slide-8--cada-fonte-reduzida-ao-grão-comum)
 
 ---
 
@@ -186,6 +204,8 @@ calendario_uf_mes  (todas as UFs × todos os meses)      ← a espinha
 de cada passo, filtro só no fim. Com isso, a contagem de linhas da tabela final fecha exatamente com o
 que era esperado.
 
+👉 **Defesa Técnica da Implementação:** [Módulo 3 — A Junção e Espinha de Calendário](preparacao_palestrante/03_slides_08_a_10_reducao_juncao_e_combustiveis.md#slide-9--a-junção-uma-espinha-de-calendário-e-cinco-left-joins)
+
 ---
 
 ## Slide 10 — Por que combustível entra numa tabela sobre comida
@@ -203,6 +223,8 @@ que era esperado.
 
 **Notas:** duas extrações independentes, grãos diferentes, mesmo número. Na maioria das fontes não
 existe uma segunda medição para confrontar; onde existe, é a checagem mais forte que se pode fazer.
+
+👉 **Defesa Técnica da Implementação:** [Módulo 3 — Combustíveis e Validação por Testemunha](preparacao_palestrante/03_slides_08_a_10_reducao_juncao_e_combustiveis.md#slide-10--por-que-combustível-entra-numa-tabela-sobre-comida)
 
 ---
 
@@ -228,6 +250,8 @@ existe uma segunda medição para confrontar; onde existe, é a checagem mais fo
 **Notas:** o requisito da disciplina era "várias dezenas de variáveis após a agregação das bases". São
 108 colunas, de 6 pesquisas de 5 instituições, todas documentadas linha a linha.
 
+👉 **Defesa Técnica da Implementação:** [Módulo 4 — A Tabela Final e suas 108 Colunas](preparacao_palestrante/04_slides_11_a_13_tabela_fato_nulos_e_validacoes.md#slide-11--a-tabela-final)
+
 ---
 
 ## Slide 12 — Cada vazio significa uma coisa diferente
@@ -252,6 +276,8 @@ existe uma segunda medição para confrontar; onde existe, é a checagem mais fo
 **Notas:** todo vazio desta base carrega uma afirmação sobre o mundo. A afirmação errada muda a
 conclusão de qualquer regressão — por isso a justificativa vai em todas as colunas, não só nas piores.
 
+👉 **Defesa Técnica da Implementação:** [Módulo 4 — Semântica dos Nulos e Perigo do Zero](preparacao_palestrante/04_slides_11_a_13_tabela_fato_nulos_e_validacoes.md#slide-12--cada-vazio-significa-uma-coisa-diferente)
+
 ---
 
 ## Slide 13 — Validação: estrutural primeiro, histórica depois
@@ -272,6 +298,8 @@ conclusão de qualquer regressão — por isso a justificativa vai em todas as c
 **Notas:** é isso que separa uma junção que **roda** de uma junção **correta**. Ninguém disse à tabela
 que esses eventos existiram — ela os reconhece sozinha.
 
+👉 **Defesa Técnica da Implementação:** [Módulo 4 — Validações Estruturais e Históricas](preparacao_palestrante/04_slides_11_a_13_tabela_fato_nulos_e_validacoes.md#slide-13--validação-estrutural-primeiro-histórica-depois)
+
 ---
 
 ## Slide 14 — O achado que justifica a última fonte existir
@@ -290,6 +318,8 @@ que esses eventos existiram — ela os reconhece sozinha.
 
 **Notas:** esse é o fechamento. A integração não só funcionou tecnicamente — ela produziu um sinal que
 nenhuma das fontes isoladas continha.
+
+👉 **Defesa Técnica da Implementação:** [Módulo 5 — Achados Empíricos: Lag e Espaço](preparacao_palestrante/05_slides_14_a_15_achados_limites_e_proximos_passos.md#slide-14--o-achado-que-justifica-a-última-fonte-existir)
 
 ---
 
@@ -314,3 +344,12 @@ nenhuma das fontes isoladas continha.
 > tudo vazio, um multiplica as linhas, e um inventa uma variação mensal que não existiu.
 > Nenhum levanta exceção. O trabalho não foi juntar os dados — foi **construir as verificações que
 > transformam erro silencioso em erro alto**.
+
+👉 **Defesa Técnica da Implementação:** [Módulo 5 — Limites de Uso e Roadmap de Modelagem](preparacao_palestrante/05_slides_14_a_15_achados_limites_e_proximos_passos.md#slide-15--limites-de-uso-e-próximos-passos)
+
+---
+
+## 🎯 Simulação e Treinamento de Perguntas da Banca
+
+Para treinar a resposta a perguntas agressivas e profundas de avaliação (como quebra de suporte espacial, escolha de mediana vs média, recusa de imputação por KNN/MICE e causalidade da defasagem), estude o:  
+👉 [**Módulo 6: Simulado de Alta Tensão da Banca (15 Perguntas e Respostas)**](preparacao_palestrante/06_simulado_perguntas_da_banca.md)

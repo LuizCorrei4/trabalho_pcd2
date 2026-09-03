@@ -53,7 +53,7 @@ cada critério e sai com código 1 enquanto o quinto não passar.
 
 ### Sobre o critério que não passa
 **Não é corrigível por código — é limitação da fonte**, e há dois problemas
-distintos, documentados em [`docs/cobertura_inmet.md`](../../docs/cobertura_inmet.md)
+distintos, documentados em [`docs/analises/cobertura_inmet.md`](../../docs/analises/cobertura_inmet.md)
 com a tabela por UF × ano em `outputs/tabelas/inmet_cobertura_uf_ano.csv`:
 
 1. **Roraima tem 3 estações no catálogo e efetivamente 1 ativa.** Em 2021 e 2026

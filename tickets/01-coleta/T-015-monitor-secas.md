@@ -40,7 +40,7 @@ Se sobrar tempo para exatamente **um** opcional, é este.
 - [x] Agregar município → UF: **% da área da UF** em cada categoria — **já vem feito pela ANA**, ver "Como foi feito"
 - [x] Criar `severidade_media` = média ponderada com pesos S0=1 … S4=5
 - [x] Criar `meses_consecutivos_S2plus` — seca é acumulativa; 6 meses seguidos de S2 machucam muito mais que 1
-- [x] Documentar a partir de que ano cada UF entrou no monitoramento → [`docs/cobertura_monitor_secas.md`](../../docs/cobertura_monitor_secas.md)
+- [x] Documentar a partir de que ano cada UF entrou no monitoramento → [`docs/analises/cobertura_monitor_secas.md`](../../docs/analises/cobertura_monitor_secas.md)
 
 ## Critérios de aceite
 - [x] Percentuais entre 0 e 100, e as categorias não se sobrepõem de forma inconsistente (`S3plus ≤ S2plus ≤ S0plus`)

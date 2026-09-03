@@ -14,7 +14,7 @@ Saída:
     data/processed/fato_alimentos_uf_mes.parquet 16 UF × meses com alvo = 2.088
     outputs/tabelas/dicionario_variaveis.csv     uma linha por coluna
 
-O desenho está em `docs/analise_juncao_uf_mes.md`. Três regras que a estrutura
+O desenho está em `docs/analises/analise_juncao_uf_mes.md`. Três regras que a estrutura
 deste arquivo existe para garantir:
 
 * **A espinha é o calendário completo e todo merge é LEFT.** As 11 UFs sem IPCA

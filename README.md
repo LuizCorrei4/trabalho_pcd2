@@ -9,6 +9,8 @@ Para navegar com clareza pelo repositório, consulte os guias especializados:
 | Documento | Público / Objetivo | O que você encontrará |
 |---|---|---|
 | 🛠️ [**Guia do Desenvolvedor & Arquitetura**](docs/guia_do_desenvolvedor.md) | Desenvolvedores e Revisores | Ciclo de vida dos dados, sistema de logging em 4 camadas, backups com rollback, contratos e como adicionar coletores. |
+| 🗺️ [**Central de Documentação**](docs/README.md) | Toda a Equipe | Portal master com mapa semântico, análises de cobertura (Mato Grosso, INMET, Secas) e desenhos de junção. |
+| 🎤 [**Guia de Apresentação & Defesa**](docs/apresentacao/preparacao_palestrante/README.md) | Apresentadores & Banca | Roteiros de slides, módulos técnicos de defesa da implementação e simulado de 15 perguntas da banca. |
 | 📡 [**Pacote de Coleta e Ingestão**](src/coleta/README.md) | Engenharia de Dados | Detalhes das 6 fontes (IPCA, INMET, Seca, Safra, BCB, Combustíveis), endpoints e granularidades. |
 | 🧪 [**Pacote de Tratamento e Junção**](src/tratamento/README.md) | Ciência de Dados & Modelagem | Regras de agregação (mediana climática, ponderação por postos) e construção da tabela fato final. |
 | 📋 [**Board de Tickets e Backlog**](tickets/README.md) | Toda a Equipe | Critérios de aceite, cronograma, dependências e status de cada tarefa (T-001 a T-051). |

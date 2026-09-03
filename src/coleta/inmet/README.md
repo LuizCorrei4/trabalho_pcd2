@@ -200,7 +200,7 @@ facilitar o agrupamento do T-021.
 4 dos 5 critérios do ticket passam. O quinto — "≥ 90% dos dias do período com ao
 menos 1 estação válida por UF" — é atendido por **25 das 27 UFs**. Média 98,0%,
 mediana 100,0%. Detalhe completo em
-[`docs/cobertura_inmet.md`](../../../docs/cobertura_inmet.md), gerado pelo
+[`docs/analises/cobertura_inmet.md`](../../../docs/analises/cobertura_inmet.md), gerado pelo
 `validar.py`, com a tabela por UF × ano em
 `outputs/tabelas/inmet_cobertura_uf_ano.csv`.
 

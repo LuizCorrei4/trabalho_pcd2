@@ -97,7 +97,7 @@ acima despencar de 85,1% (2019) para 47,1% (2021).
 E **2021 é justamente o ano da crise hídrica do Centro-Sul**, que o Monitor de
 Secas (T-015) aponta como o episódio mais severo da série. O período de maior
 interesse analítico é o de pior cobertura climática. Detalhe por UF × ano em
-[`docs/cobertura_inmet.md`](../../../docs/cobertura_inmet.md).
+[`docs/analises/cobertura_inmet.md`](../../../docs/analises/cobertura_inmet.md).
 
 ### Volume
 Os ZIPs de 2020 (103 MB) e 2024 (102 MB) passam do **limite rígido de 100 MB por
