@@ -1,40 +1,32 @@
-# Análise de Dados Básica
-# pandas 3.x já saiu e muda o dtype de texto (str em vez de object), o que faz
-# `select_dtypes("object")` emitir Pandas4Warning. Fixado no 2.x até o grupo migrar.
+# --------------------------------------------------------------------------- #
+# Engenharia e Análise de Dados (Coleta, Tratamento e Junção)                #
+# --------------------------------------------------------------------------- #
 pandas<3
 numpy
 pyarrow
-
-# Coleta (APIs públicas: SIDRA/IBGE, BCB, INMET...)
 requests
+sidrapy
 
-# Coleta (APIs do IBGE/SIDRA) e escrita de parquet
-requests
-pyarrow
-
-# Coleta de dados (T-014 INMET, T-015 Monitor de Secas)
-requests
-pyarrow  # leitura/escrita dos Parquet de data/interim/
-
-# Visualização de Dados
+# --------------------------------------------------------------------------- #
+# Visualização e Análise Exploratória (EDA)                                  #
+# --------------------------------------------------------------------------- #
 matplotlib
 seaborn
 
-# Aprendizado de Máquina e Estatística
+# --------------------------------------------------------------------------- #
+# Aprendizado de Máquina e Modelagem Estatística                              #
+# --------------------------------------------------------------------------- #
 scikit-learn
 xgboost
 statsmodels
 
-# Dados Espaciais e Geográficos
+# --------------------------------------------------------------------------- #
+# Dados Espaciais e Geográficos                                               #
+# --------------------------------------------------------------------------- #
 geopandas
-pysal
 
-# Ambiente de Desenvolvimento e Jupyter
-jupyterlab
-notebook
+# --------------------------------------------------------------------------- #
+# Desenvolvimento, Notebooks e Configuração                                   #
+# --------------------------------------------------------------------------- #
 ipykernel
-
-# Utilitários Adicionais
 python-dotenv
-openai
-langchain
