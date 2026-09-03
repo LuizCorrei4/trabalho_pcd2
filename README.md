@@ -35,17 +35,24 @@ python -m src.coleta.runner --all
 python -m src.coleta.runner --status
 
 # 3. Executar apenas UMA fonte específica
-python -m src.coleta.runner --fonte ipca      # IPCA Alimentos (16 Áreas Urbanas)
-python -m src.coleta.runner --fonte inmet     # Clima BDMEP (INMET)
-python -m src.coleta.runner --fonte seca      # Monitor de Secas (ANA)
-python -m src.coleta.runner --fonte safra     # Estimativas de Safra (LSPA/PAM)
-python -m src.coleta.runner --fonte bcb       # Variáveis Macroeconômicas (BCB/SGS)
+python -m src.coleta.runner --fonte ipca          # IPCA Alimentos (16 Áreas Urbanas)
+python -m src.coleta.runner --fonte inmet         # Clima BDMEP (INMET)
+python -m src.coleta.runner --fonte seca          # Monitor de Secas (ANA)
+python -m src.coleta.runner --fonte safra         # Estimativas de Safra (LSPA/PAM)
+python -m src.coleta.runner --fonte bcb           # Variáveis Macroeconômicas (BCB/SGS)
+python -m src.coleta.runner --fonte combustiveis  # Preços de Combustíveis (ANP)
 
-# 4. Executar um SUBCONJUNTO selecionado
-python -m src.coleta.runner --fontes ipca,bcb
+# 4. Executar o Pipeline de Tratamento e Junção Final (Etapa 2)
+python -m src.coleta.runner --tratamento         # Executa clima_uf_mes -> junta (fato) -> combustíveis
+
+# 5. Executar a Esteira Completa End-to-End (Coleta + Tratamento)
+python -m src.coleta.runner --completo           # Baixa/atualiza tudo e gera as tabelas fatos finais
+
+# 6. Executar um SUBCONJUNTO selecionado
+python -m src.coleta.runner --fontes ipca,bcb,combustiveis
 python -m src.coleta.runner --fontes inmet,seca
 
-# 5. Políticas de Sobrescrita Granular (--overwrite)
+# 7. Políticas de Sobrescrita Granular (--overwrite)
 python -m src.coleta.runner --all --overwrite skip       # Padrão: pula arquivos completos
 python -m src.coleta.runner --fonte ipca --force         # Força re-download e substituição total
 python -m src.coleta.runner --fonte bcb --backup         # Cria cópia de segurança antes de sobrescrever

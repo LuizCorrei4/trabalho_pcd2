@@ -33,7 +33,7 @@ from ..logging_config import (
     inicializar_sessao_logging,
     obter_pasta_logs,
 )
-from . import bcb, inmet, monitor_secas, safra, sidra_ipca
+from . import bcb, combustiveis, inmet, monitor_secas, safra, sidra_ipca
 from .base import ColetaResult, calcular_tamanho_caminho
 
 # --------------------------------------------------------------------------- #
@@ -81,9 +81,17 @@ COLETORES: dict[str, dict[str, Any]] = {
         "aliases": ["sgs", "macro", "banco_central", "dolar", "selic"],
         "pasta_raw": config.DATA_RAW / "bcb_var_macroeconômicas",
     },
+    "combustiveis": {
+        "nome_exibicao": "Preços de Combustíveis (ANP)",
+        "modulo": combustiveis,
+        "funcao": combustiveis.executar_coleta,
+        "arquivo_principal": config.DATA_INTERIM / "combustiveis_uf_mes.parquet",
+        "aliases": ["combustivel", "anp", "diesel", "gasolina"],
+        "pasta_raw": config.DATA_RAW / "combustiveis",
+    },
 }
 
-ORDEM_EXECUCAO_PADRAO = ["ipca", "inmet", "seca", "safra", "bcb"]
+ORDEM_EXECUCAO_PADRAO = ["ipca", "inmet", "seca", "safra", "bcb", "combustiveis"]
 
 
 def resolver_nome_fonte(termo: str) -> str | None:
@@ -200,6 +208,11 @@ def inspecionar_status_disco() -> int:
         ("Estimativas Safra (LSPA)", config.DATA_INTERIM / "safra_uf_mes.parquet"),
         ("Produção Safra (PAM)", config.DATA_INTERIM / "producao_uf_ano.parquet"),
         ("Variáveis Macro (BCB)", config.DATA_INTERIM / "macro_br_mes.parquet"),
+        ("Combustíveis ANP (Interim)", config.DATA_INTERIM / "combustiveis_uf_mes.parquet"),
+        ("Clima Agregado UF (Interim)", config.DATA_INTERIM / "clima_uf_mes.parquet"),
+        ("Fato Alimentos UF (Processed)", config.DATA_PROCESSED / "fato_alimentos_uf_mes.parquet"),
+        ("Fato + Combustíveis (Processed)", config.DATA_PROCESSED / "fato_alimentos_combustiveis_uf_mes.parquet"),
+        ("Calendário UF x Mês (Processed)", config.DATA_PROCESSED / "calendario_uf_mes.parquet"),
         ("Dimensão Territorial (UF)", config.DATA_PROCESSED / "dim_uf.csv"),
         ("CONAB Série Histórica", config.DATA_RAW / "conab" / "SerieHistoricaGraos.txt"),
     ]
@@ -296,7 +309,10 @@ def construir_parser() -> argparse.ArgumentParser:
 Exemplos de uso:
   python -m src.coleta.runner --all                       # Executa todos os coletores no modo seguro
   python -m src.coleta.runner --fonte ipca                # Executa apenas a coleta do IPCA
+  python -m src.coleta.runner --fonte combustiveis        # Executa ingestão de combustíveis ANP
   python -m src.coleta.runner --fontes inmet,seca         # Executa apenas INMET e Monitor de Secas
+  python -m src.coleta.runner --tratamento                # Executa tratamento e junção final (clima -> fato -> combustíveis)
+  python -m src.coleta.runner --completo                  # Executa esteira completa end-to-end (coleta + tratamento)
   python -m src.coleta.runner --all --overwrite force     # Força nova coleta descartando checkpoints
   python -m src.coleta.runner --fonte bcb --backup        # Coleta BCB mantendo backup de segurança
   python -m src.coleta.runner --all --interactive         # Confirmação interativa antes de sobrescrever
@@ -307,8 +323,10 @@ Exemplos de uso:
     # Grupo de Seleção de Escopo
     escopo = parser.add_argument_group("Seleção de Escopo")
     escopo.add_argument("--all", "-a", action="store_true", help="executa TODOS os coletores na ordem correta")
-    escopo.add_argument("--fonte", type=str, metavar="NOME", help="executa uma única fonte (ipca, inmet, seca, safra, bcb)")
+    escopo.add_argument("--fonte", type=str, metavar="NOME", help="executa uma única fonte (ipca, inmet, seca, safra, bcb, combustiveis)")
     escopo.add_argument("--fontes", type=str, metavar="N1,N2", help="executa uma lista separada por vírgulas (ex: ipca,bcb)")
+    escopo.add_argument("--tratamento", "-t", action="store_true", help="executa o pipeline de tratamento e junção dos dados (clima -> fato -> combustíveis)")
+    escopo.add_argument("--completo", "--full", action="store_true", help="executa esteira completa end-to-end (todas as coletas + tratamento e junção final)")
     escopo.add_argument("--status", "--dry-run", action="store_true", help="exibe o estado dos dados em disco sem fazer requisições")
 
     # Grupo de Políticas de Sobrescrita
@@ -353,7 +371,7 @@ def resolver_politica_sobrescrita(args: argparse.Namespace) -> str:
 
 def resolver_fontes_selecionadas(args: argparse.Namespace) -> list[str]:
     """Determina a lista ordenada de fontes a serem executadas."""
-    if args.all:
+    if args.all or args.completo:
         return list(ORDEM_EXECUCAO_PADRAO)
 
     if args.fonte:
@@ -375,7 +393,7 @@ def resolver_fontes_selecionadas(args: argparse.Namespace) -> list[str]:
                 selecionadas.append(resolvido)
         return [f for f in ORDEM_EXECUCAO_PADRAO if f in selecionadas]
 
-    # Se nenhum argumento de escopo foi passado
+    # Se nenhum argumento de coleta foi passado
     return []
 
 
@@ -388,9 +406,9 @@ def main(argv: list[str] | None = None) -> int:
         return inspecionar_status_disco()
 
     fontes_a_executar = resolver_fontes_selecionadas(args)
-    if not fontes_a_executar:
+    if not fontes_a_executar and not args.tratamento:
         parser.print_help()
-        print("\n💡 Especifique o escopo desejado: --all, --fonte <nome> ou --fontes <n1,n2>")
+        print("\n💡 Especifique o escopo desejado: --all, --fonte <nome>, --fontes <n1,n2>, --tratamento ou --completo")
         return 1
 
     politica = resolver_politica_sobrescrita(args)
@@ -477,6 +495,35 @@ def main(argv: list[str] | None = None) -> int:
                 detalhes=resultado.detalhes,
             )
         )
+
+    # Executa o Pipeline de Tratamento se solicitado (--tratamento ou --completo)
+    if args.tratamento or args.completo:
+        from ..tratamento.orquestrador import executar_pipeline_tratamento
+
+        logger.info("\n" + "=" * 75)
+        logger.info("⚙️  INICIANDO PIPELINE DE TRATAMENTO E JUNÇÃO FINAL DOS DADOS")
+        logger.info("=" * 75)
+
+        resultados_tratamento = executar_pipeline_tratamento(overwrite=politica, logger=logger)
+        for res_t in resultados_tratamento:
+            resultados.append(res_t)
+            manifesto.adicionar_modulo(
+                ModuloExecucaoMeta(
+                    fonte=res_t.fonte,
+                    status=res_t.status,
+                    acao_executada=res_t.acao_executada,
+                    duracao_segundos=res_t.duracao_segundos,
+                    linhas_geradas=res_t.linhas,
+                    colunas_geradas=res_t.colunas,
+                    arquivo_saida=res_t.arquivo_saida,
+                    tamanho_bytes=res_t.tamanho_bytes,
+                    chunks_totais=res_t.chunks_totais,
+                    chunks_baixados=res_t.chunks_baixados,
+                    chunks_reaproveitados=res_t.chunks_reaproveitados,
+                    erros=res_t.erros,
+                    detalhes=res_t.detalhes,
+                )
+            )
 
     # Finaliza e grava o Manifesto JSON (Camada 3)
     caminho_manifesto = manifesto.finalizar()

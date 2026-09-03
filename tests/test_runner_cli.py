@@ -31,12 +31,27 @@ class TestRunnerCLI(unittest.TestCase):
         self.assertEqual(resolver_nome_fonte("bcb"), "bcb")
         self.assertEqual(resolver_nome_fonte("sgs"), "bcb")
         self.assertEqual(resolver_nome_fonte("macro"), "bcb")
+        self.assertEqual(resolver_nome_fonte("combustiveis"), "combustiveis")
+        self.assertEqual(resolver_nome_fonte("anp"), "combustiveis")
+        self.assertEqual(resolver_nome_fonte("diesel"), "combustiveis")
         self.assertIsNone(resolver_nome_fonte("fonte_inexistente"))
 
     def test_parser_escopo_all(self):
         args = self.parser.parse_args(["--all"])
         fontes = resolver_fontes_selecionadas(args)
-        self.assertEqual(fontes, ["ipca", "inmet", "seca", "safra", "bcb"])
+        self.assertEqual(fontes, ["ipca", "inmet", "seca", "safra", "bcb", "combustiveis"])
+
+    def test_parser_escopo_completo(self):
+        args = self.parser.parse_args(["--completo"])
+        self.assertTrue(args.completo)
+        fontes = resolver_fontes_selecionadas(args)
+        self.assertEqual(fontes, ["ipca", "inmet", "seca", "safra", "bcb", "combustiveis"])
+
+    def test_parser_escopo_tratamento(self):
+        args = self.parser.parse_args(["--tratamento"])
+        self.assertTrue(args.tratamento)
+        fontes = resolver_fontes_selecionadas(args)
+        self.assertEqual(fontes, [])
 
     def test_parser_escopo_individual(self):
         args = self.parser.parse_args(["--fonte", "ipca"])
@@ -44,9 +59,9 @@ class TestRunnerCLI(unittest.TestCase):
         self.assertEqual(fontes, ["ipca"])
 
     def test_parser_escopo_subconjunto(self):
-        args = self.parser.parse_args(["--fontes", "ipca,bcb"])
+        args = self.parser.parse_args(["--fontes", "ipca,bcb,combustiveis"])
         fontes = resolver_fontes_selecionadas(args)
-        self.assertEqual(fontes, ["ipca", "bcb"])
+        self.assertEqual(fontes, ["ipca", "bcb", "combustiveis"])
 
     def test_parser_politica_sobrescrita(self):
         args_padrao = self.parser.parse_args(["--all"])
