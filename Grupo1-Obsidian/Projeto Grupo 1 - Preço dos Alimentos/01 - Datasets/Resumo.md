@@ -136,6 +136,36 @@
 > [!check] Decisão: ✅ Utilizar (Fonte primária de variáveis meteorológicas e anomalias climáticas) 
 > **Justificativa:** O dataset fornece uma malha densa de 701 estações com cobertura completa do período analisado (2014–2026). Ele complementa o Monitor de Secas da ANA ao trazer métricas contínuas de precipitação, picos térmicos absolutos e amplitude térmica, fundamentais para capturar choques climáticos pontuais e agudos sobre a oferta agrícola.
 ---
+
+### 3.7 `anp_combustiveis`
+
+- **Fonte:** Agência Nacional do Petróleo, Gás Natural e Biocombustíveis ([[ANP]])
+- **Papel no Projeto:** Integrar os custos logísticos de transporte rodoviário (diesel) e de preparo doméstico (GLP) à modelagem. Explica a variabilidade regional de preços que variáveis macroeconômicas nacionais (como Dólar e Selic) não conseguem capturar.
+**Perguntas avaliadas:**  
+
+- **Quais variáveis estão disponíveis?**
+    - Preço ao consumidor final (`comb_preco_*`) de 5 produtos essenciais: Diesel, Diesel S10, Gasolina, Etanol e GLP 13kg. _(Gasolina Aditivada, GNV e preços de compra/distribuidora foram descartados por baixa cobertura ou interrupção na série)_.
+    - Variações percentuais de preço: mensal (`comb_var_mm_*`) e anual (`comb_var12_*`).        
+    - Desvio espacial: `comb_diesel_vs_br_pct` (distância percentual do preço da UF contra a mediana nacional).
+    - Metadados e auditoria: Número de postos pesquisados (`comb_n_registros`) e flags booleanos indicando meses com pesquisa ativa (`comb_observado`, `comb_observado_liquidos`).
+- **Qual é a granularidade regional?**
+    - Agregado por Estado (`sigla_uf`). O valor consolidado da ANP foi validado contra uma amostra testemunha de mais de 96 mil coletas individuais de postos, confirmando altíssima fidelidade (erro absoluto mediano de apenas 0,6%).
+- **Qual é a periodicidade?**
+    - Mensal (`ano_mes`).        
+- **Qual é a cobertura temporal?**
+    - Histórico original de 2004-05 a 2026-07. Para a janela do projeto (2015 a 2026), a cobertura espacial nas 16 UFs é perfeita nos meses em que a pesquisa ocorreu, mas há **lacunas temporais sistêmicas** (33 meses sem coleta de líquidos e 15 meses sem GLP).
+- **Os dados podem ser relacionados aos preços observados?**      
+    - Sim. O Diesel compõe o frete que escoa a safra (impactando o IPCA com defasagem estimada de 4 a 5 meses). O GLP impacta simultaneamente a mesma cesta do IPCA medida pelo IBGE.
+- **Quais cuidados metodológicos são exigidos?**
+    - **Ponderação de Duplicatas:** Existência de levas duplas de pesquisa no mesmo mês (ex.: 2026-04). Foi aplicada média ponderada pela `quantidade_registros` (postos) para evitar vieses extremos que chegavam a distorcer o preço médio em 45%.         
+    - **A Armadilha do _Shift_:** As variações (`var_mm` e `var12`) foram calculadas apenas **após** reindexar a série para a grade temporal completa. Sem isso, um buraco de coleta faria o Pandas calcular a variação de março diretamente contra julho, mascarando o choque real.
+    - **Preservação Semântica dos Nulos (NaN):** Valores vazios indicam estritamente que a ANP não foi a campo naqueles meses (nacionalmente). Não é permitido o uso de _forward fill_ ou preenchimento com zeros, sob o risco de criar planícies ou degraus artificiais no modelo. O controle deve ser feito via flag `comb_observado`.
+    
+> [!check] Decisão: ✅ Utilizar (Fonte primária de custos logísticos e de cocção)
+> 
+> **Justificativa:** O dataset entrega a dimensão de custo de frete agrícola (Diesel) e despesa domiciliar (GLP) com as variações regionais necessárias para diferenciar o impacto inflacionário entre as capitais. A manobra de pivotamento e o tratamento rigoroso das lacunas da ANP garantem a integração das 19 novas features sem corromper a espinha ou multiplicar as linhas da tabela fato já consolidada.
+
+---
 ### 3.7 Critérios de Decisão
 * ✅ **Utilizar:** Apresenta informações relevantes, consistentes e adequadas ao escopo temporal/espacial.
 * 🟡 **Utilizar parcialmente:** Variáveis específicas aproveitadas (ex.: features de contexto ou broadcast).
@@ -178,5 +208,3 @@ A análise adota a escala regional como pilar central, permitindo mensurar dispa
 Padronização centralizada via arquivo `dim_uf.csv` para unificar códigos IBGE, siglas, nomes e macrorregiões entre todas as tabelas brutas.
 
 ---
-
-## 8. Integração das Bases

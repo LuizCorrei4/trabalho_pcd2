@@ -92,19 +92,20 @@ As bases estão sendo avaliadas considerando principalmente:
 
 ### Bases atualmente em avaliação
 
-| **Base**                  | **Fonte / Instituição**       | **Papel / Contribuição no Projeto**                                                                                                | **Status** | **Decisão**              |
-| ------------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ---------- | ------------------------ |
-| `sidra_ipca`              | [[IBGE]] / [[SIDRA]]          | **Variável-alvo (target):** Taxa de variação percentual mensal e pesos orçamentários de alimentos em 16 áreas urbanas.             | Avaliada   | ✅ Utilizar               |
-| `bcb_var_macroeconomicas` | [[Banco Central do Brasil]]   | **Contexto macroeconômico:** Câmbio (PTAX), Selic, IPCA geral e IGP-M via _broadcast_ nacional contínuo (2014–2026).               | Avaliada   | ✅ Utilizar               |
-| `inmet_clima`             | [[INMET]]                     | **Choques climáticos:** Precipitação mensal acumulada, temperaturas extremas, mínimas absolutas (geadas) e umidade (701 estações). | Avaliada   | ✅ Utilizar               |
-| `estimativas_safra_UF`    | [[IBGE]] ([[LSPA]] / [[PAM]]) | **Choques de oferta agrícola:** Variação mensal de rendimento ($kg/ha$), área colhida e revisões de produção por cultura e UF.     | Avaliada   | ✅ Utilizar               |
-| `monitor_secas_ana`       | [[ANA]]                       | **Persistência de secas:** Índices consolidados de severidade territorial e duração contínua de estiagem grave ($S2+$) por UF.     | Avaliada   | 🟡 Utilizar parcialmente |
-| `conab`                   | CONAB                         | Informações de safra e balanço de oferta/demanda com baixa frequência temporal (anual).                                            | Avaliada   | ❌ Descartar              |
+| **Base**                  | **Fonte / Instituição**       | **Papel / Contribuição no Projeto**                                                                                                                                                                                   | **Status** | **Decisão**              |
+| ------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ------------------------ |
+| `sidra_ipca`              | [[IBGE]] / [[SIDRA]]          | **Variável-alvo (target):** Taxa de variação percentual mensal e pesos orçamentários de alimentos em 16 áreas urbanas.                                                                                                | Avaliada   | ✅ Utilizar               |
+| `bcb_var_macroeconomicas` | [[Banco Central do Brasil]]   | **Contexto macroeconômico:** Câmbio (PTAX), Selic, IPCA geral e IGP-M via _broadcast_ nacional contínuo (2014–2026).                                                                                                  | Avaliada   | ✅ Utilizar               |
+| `inmet_clima`             | [[INMET]]                     | **Choques climáticos:** Precipitação mensal acumulada, temperaturas extremas, mínimas absolutas (geadas) e umidade (701 estações).                                                                                    | Avaliada   | ✅ Utilizar               |
+| `estimativas_safra_UF`    | [[IBGE]] ([[LSPA]] / [[PAM]]) | **Choques de oferta agrícola:** Variação mensal de rendimento ($kg/ha$), área colhida e revisões de produção por cultura e UF.                                                                                        | Avaliada   | ✅ Utilizar               |
+| `monitor_secas_ana`       | [[ANA]]                       | **Persistência de secas:** Índices consolidados de severidade territorial e duração contínua de estiagem grave ($S2+$) por UF.                                                                                        | Avaliada   | 🟡 Utilizar parcialmente |
+| `conab`                   | CONAB                         | Informações de safra e balanço de oferta/demanda com baixa frequência temporal (anual).                                                                                                                               | Avaliada   | ❌ Descartar              |
+| `anp_combustiveis`        | ANP                           | Integrar os custos logísticos de frete rodoviário (Diesel) e de cocção doméstica (GLP) à modelagem. Adiciona a dimensão espacial e regional de custos que variáveis macroeconômicas nacionais não conseguem capturar. | Avaliada   | ✅ Utilizar               |
 
 
 >[!note] Diretriz de Uso no Modelo 
 >
->As bases marcadas com **✅ Utilizar** compõem a estrutura principal do pipeline analítico (inflação de alimentos, macroeconomia, meteorologia de superfície e acompanhamento conjuntural de safras pelo LSPA). A base `monitor_secas_ana` entra como complemento com controle estrito de valores nulos para o período pré-monitoramento. A base `conab` foi **descartada** por limitações de frequência (dados anuais por safra que violam o rigor da análise mensal) e redundância frente ao LSPA/IBGE.
+>As bases marcadas com **✅ Utilizar** compõem a estrutura principal do pipeline analítico (inflação de alimentos, macroeconomia, meteorologia de superfície, combustíveis e acompanhamento conjuntural de safras pelo LSPA). A base `monitor_secas_ana` entra como complemento com controle estrito de valores nulos para o período pré-monitoramento. A base `conab` foi **descartada** por limitações de frequência (dados anuais por safra que violam o rigor da análise mensal) e redundância frente ao LSPA/IBGE.
 
 
 ---
