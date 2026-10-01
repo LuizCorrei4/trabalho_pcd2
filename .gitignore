@@ -85,3 +85,6 @@ temp/
 logs/*
 !logs/.gitkeep
 !logs/README.md
+
+# artifacts of the graphify-out
+graphify-out/

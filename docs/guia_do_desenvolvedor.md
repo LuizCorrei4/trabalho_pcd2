@@ -47,7 +47,7 @@ data/
 - **Preservação local:** O `.gitignore` foi configurado para ignorar os dados no Git sem apagar nenhum arquivo do seu disco local.
 
 ### O que fica no Git vs. O que é gerado localmente:
-- ✅ **Versionado no Git:** Código-fonte (`src/`), testes (`tests/`), documentações (`docs/`, `.md`), notebooks (`notebooks/`), a tabela-dimensão canônica ([`data/processed/dim_uf.csv`](file:///home/gabyl/projetos/trabalho_pcd2/data/processed/dim_uf.csv)) e arquivos `.gitkeep`.
+- ✅ **Versionado no Git:** Código-fonte (`src/`), testes (`tests/`), documentações (`docs/`, `.md`), notebooks (`notebooks/`), a tabela-dimensão canônica (`data/processed/dim_uf.csv`) e arquivos `.gitkeep`.
 - ❌ **Ignorado pelo Git (gerado pelo orquestrador):** Arquivos em `data/raw/*`, `data/interim/*`, `data/processed/*.parquet`, `logs/` e arquivos de backup `*.bak`.
 
 ---
@@ -101,7 +101,7 @@ python -m src.coleta.runner --completo
 
 ## 5. Arquitetura de Logging e Auditoria em 4 Camadas
 
-Implementada em [`src/logging_config.py`](file:///home/gabyl/projetos/trabalho_pcd2/src/logging_config.py):
+Implementada em `src/logging_config.py`:
 
 ```mermaid
 flowchart LR
@@ -170,31 +170,31 @@ Para plugar uma nova fonte de dados no orquestrador:
 
 A esteira de tratamento transforma as tabelas isoladas da camada `interim` nas tabelas modeladas de `processed`:
 
-1. **[`src/tratamento/21_clima_uf_mes.py`](file:///home/gabyl/projetos/trabalho_pcd2/src/tratamento/21_clima_uf_mes.py):**
+1. **`src/tratamento/21_clima_uf_mes.py`:**
    - Reduz 701 estações meteorológicas para a grade UF × mês.
    - Aplica corte de qualidade (estações com < 70% de dias válidos no mês viram `NaN` antes da agregação).
    - Agrega por **mediana** (e nunca média) para imunidade a sensores defeituosos.
-2. **[`src/tratamento/24_junta.py`](file:///home/gabyl/projetos/trabalho_pcd2/src/tratamento/24_junta.py):**
+2. **`src/tratamento/24_junta.py`:**
    - Cria o calendário completo (27 UFs × 138 meses = 3.726 linhas) como espinha dorsal.
    - Realiza `LEFT JOIN` com validação estrita (`checa_join`) das 5 fontes (IPCA, Clima UF, Safra, Seca, Macro).
-   - Gera [`data/processed/fato_alimentos_uf_mes.parquet`](file:///home/gabyl/projetos/trabalho_pcd2/data/processed/fato_alimentos_uf_mes.parquet) (2.088 linhas com alvo IPCA × 89 colunas).
-   - Gera o dicionário de variáveis documentado em [`outputs/tabelas/dicionario_variaveis.csv`](file:///home/gabyl/projetos/trabalho_pcd2/outputs/tabelas/dicionario_variaveis.csv).
-3. **[`src/tratamento/25_combustiveis.py`](file:///home/gabyl/projetos/trabalho_pcd2/src/tratamento/25_combustiveis.py):**
+   - Gera `data/processed/fato_alimentos_uf_mes.parquet` (2.088 linhas com alvo IPCA × 89 colunas).
+   - Gera o dicionário de variáveis documentado em `['outputs/tabelas/dicionario_variaveis.csv']`.
+3. **`src/tratamento/25_combustiveis.py`:**
    - Pondera preços de combustíveis da ANP pelo volume de postos pesquisados.
    - Integra as variáveis de frete e choque energético à tabela fato.
-   - Gera [`data/processed/fato_alimentos_combustiveis_uf_mes.parquet`](file:///home/gabyl/projetos/trabalho_pcd2/data/processed/fato_alimentos_combustiveis_uf_mes.parquet) (2.088 linhas × 108 colunas).
-   - Gera o dicionário de variáveis documentado em [`outputs/tabelas/dicionario_variaveis_combustiveis.csv`](file:///home/gabyl/projetos/trabalho_pcd2/outputs/tabelas/dicionario_variaveis_combustiveis.csv).
+   - Gera `data/processed/fato_alimentos_combustiveis_uf_mes.parquet` (2.088 linhas × 108 colunas).
+   - Gera o dicionário de variáveis documentado em `['outputs/tabelas/dicionario_variaveis_combustiveis.csv']`.
 
 ---
 
 ## 9. Testes Automatizados
 
-O projeto possui suíte de testes unitários em [`tests/`](file:///home/gabyl/projetos/trabalho_pcd2/tests/):
+O projeto possui suíte de testes unitários em `['tests/']`:
 
 ```bash
 # Executa todos os testes unitários e de integração
 python -m unittest discover -s tests -v
 ```
 
-- [`tests/test_logging_and_backup.py`](file:///home/gabyl/projetos/trabalho_pcd2/tests/test_logging_and_backup.py): Valida formatação ANSI, atomicidade do CSV transacional, manifestos JSON e rollback do `BackupManager`.
-- [`tests/test_runner_cli.py`](file:///home/gabyl/projetos/trabalho_pcd2/tests/test_runner_cli.py): Valida parsing de flags CLI, resolução de nomes/aliases de fontes e auditoria de integridade do disco.
+- `['tests/test_logging_and_backup.py']`: Valida formatação ANSI, atomicidade do CSV transacional, manifestos JSON e rollback do `BackupManager`.
+- `['tests/test_runner_cli.py']`: Valida parsing de flags CLI, resolução de nomes/aliases de fontes e auditoria de integridade do disco.
