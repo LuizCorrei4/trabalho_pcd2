@@ -58,7 +58,7 @@ O critério de aceite do T-014 é **>= 90%** dos dias por UF.
 | 2026 | 96.0% |
 
 A tabela completa por UF × ano está em
-`outputs/tabelas/inmet_cobertura_uf_ano.csv`.
+`outputs\tabelas\inmet_cobertura_uf_ano.csv`.
 
 ## Duas limitações reais da fonte
 
