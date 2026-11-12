@@ -18,10 +18,10 @@ docs/
 ├── guia_do_desenvolvedor.md                  <- Manual de Arquitetura, Contratos e Engenharia de Dados
 │
 ├── analises/                                 <- Estudos Técnicos, Desenho de Junção e Auditorias de Cobertura
-│   ├── analise_cobertura_safra_mt.md         <- Auditoria das 11 UFs sem IPCA e Soluções para Safra de MT
-│   ├── analise_juncao_uf_mes.md              <- Desenho metodológico da junção (T-020, T-021, T-024)
-│   ├── cobertura_inmet.md                    <- Auditoria da rede de estações meteorológicas (T-014)
-│   └── cobertura_monitor_secas.md            <- Histórico de expansão territorial do Monitor de Secas (T-015)
+│   ├── README.md                            <- Guia dos temas e documentos de análise
+│   ├── safras_oferta/                       <- EDA 13, hipótese H2, auditoria, decisões e cobertura de MT
+│   ├── clima_cobertura/                     <- Cobertura do INMET e do Monitor de Secas
+│   └── integracao_dados/                    <- Desenho metodológico da junção UF × mês
 │
 └── apresentacao/                             <- Roteiros de Slides, Defesa Técnica e Critérios da Banca
     ├── roteiro_simplificado.md               <- Roteiro executivo de 15 slides (com notas e links técnicos)
@@ -50,14 +50,17 @@ docs/
 
 ## 🔬 2. Análises Técnicas e Desenho Metodológico ([`docs/analises/`](analises/))
 
-Esta subpasta reúne as notas técnicas que embasaram cada decisão de engenharia de dados e tratamento estatístico das fontes:
+Esta subpasta reúne notas técnicas e estudos organizados por tema. Consulte o [guia de análises](analises/README.md) para saber o que cada documento aborda e a ordem de leitura recomendada:
 
 | Documento | Questão Central Respondida |
 |---|---|
-| 🌾 [**`analise_cobertura_safra_mt.md`**](analises/analise_cobertura_safra_mt.md) | **Como fica a safra de Mato Grosso (29% da soja e 38% do milho do Brasil) se MT não tem IPCA?**<br>Rastreia o descarte no filtro final, demonstra o "ponto cego" de estados consumidores como SP/RJ e apresenta 3 soluções metodológicas (broadcast de safra nacional, ponderação PAM e matriz de transporte). |
-| 🔗 [**`analise_juncao_uf_mes.md`**](analises/analise_juncao_uf_mes.md) | **Como harmonizar 4 bases em grãos diferentes para uma tabela retangular única?**<br>Documento base dos tickets T-020, T-021 e T-024: contratos de chaves, espinha de calendário e eliminação das armadilhas de join. |
-| 🌦️ [**`cobertura_inmet.md`**](analises/cobertura_inmet.md) | **Qual a confiabilidade da rede meteorológica brasileira?**<br>Diagnóstico das 701 estações automáticas do INMET, quebras de layout em 2019, tratamento de sentinelas `-9999` e a crise de cobertura hídrica de 2021. |
-| 🌵 [**`cobertura_monitor_secas.md`**](analises/cobertura_monitor_secas.md) | **A partir de quando cada estado passou a ser monitorado pela ANA?**<br>Linha do tempo da expansão do Monitor de Secas (2014 no Nordeste $\to$ 2020 no Centro-Sul $\to$ 2023 no Norte) e por que nulos dessa fonte não podem virar zero. |
+| [**`02_estudo_safras_oferta.md`**](analises/safras_oferta/02_estudo_safras_oferta.md) | O que os achados do notebook 13 sustentam sobre oferta agrícola, transmissão aos preços e hipótese H2? Inclui limites das conclusões e confronto com decisões anteriores. |
+| [**`03_auditoria_eda_safras_oferta.md`**](analises/safras_oferta/03_auditoria_eda_safras_oferta.md) | Quais números e interpretações precisam ser corrigidos? Conferência das bases locais, tendências, revisões brutas, volatilidade e reprodução dos diagnósticos. |
+| [**`04_plano_decisoes_safras_oferta.md`**](analises/safras_oferta/04_plano_decisoes_safras_oferta.md) | O que fazer primeiro e como decidir se uma mudança melhora o estudo? Prioridades, experimentos, critérios de aceite e registro de decisões propostas. |
+| 🌾 [**`01_analise_cobertura_safra_mt.md`**](analises/safras_oferta/01_analise_cobertura_safra_mt.md) | **Como fica a safra de Mato Grosso (29% da soja e 38% do milho do Brasil) se MT não tem IPCA?**<br>Rastreia o descarte no filtro final, demonstra o "ponto cego" de estados consumidores como SP/RJ e apresenta 3 soluções metodológicas (broadcast de safra nacional, ponderação PAM e matriz de transporte). |
+| 🔗 [**`01_analise_juncao_uf_mes.md`**](analises/integracao_dados/01_analise_juncao_uf_mes.md) | **Como harmonizar 4 bases em grãos diferentes para uma tabela retangular única?**<br>Documento base dos tickets T-020, T-021 e T-024: contratos de chaves, espinha de calendário e eliminação das armadilhas de join. |
+| 🌦️ [**`01_cobertura_inmet.md`**](analises/clima_cobertura/01_cobertura_inmet.md) | **Qual a confiabilidade da rede meteorológica brasileira?**<br>Diagnóstico das 701 estações automáticas do INMET, quebras de layout em 2019, tratamento de sentinelas `-9999` e a crise de cobertura hídrica de 2021. |
+| 🌵 [**`02_cobertura_monitor_secas.md`**](analises/clima_cobertura/02_cobertura_monitor_secas.md) | **A partir de quando cada estado passou a ser monitorado pela ANA?**<br>Linha do tempo da expansão do Monitor de Secas (2014 no Nordeste $\to$ 2020 no Centro-Sul $\to$ 2023 no Norte) e por que nulos dessa fonte não podem virar zero. |
 
 ---
 

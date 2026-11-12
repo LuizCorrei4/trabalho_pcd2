@@ -6,7 +6,7 @@ Uso (a partir da raiz do repositório):
 
 Entrada:  `data/raw/ana/dados_tabulares_uf_*.json` (etapa 1)
 Saída:    `data/interim/seca_uf_mes.parquet`
-          `docs/cobertura_monitor_secas.md` (quando cada UF entrou no monitoramento)
+          `docs/analises/clima_cobertura/02_cobertura_monitor_secas.md` (quando cada UF entrou no monitoramento)
 
 Duas decisões de modelagem que valem ser lidas antes de usar a tabela:
 
@@ -31,7 +31,7 @@ from . import CATEGORIAS, PESOS, PONTOS_BASE
 from .download import caminho_bruto
 
 SAIDA = config.DATA_INTERIM / "seca_uf_mes.parquet"
-DOC_COBERTURA = config.DOCS / "analises" / "cobertura_monitor_secas.md"
+DOC_COBERTURA = config.DOCS / "analises" / "clima_cobertura" / "02_cobertura_monitor_secas.md"
 TABELA_COBERTURA = config.OUT_TABELAS / "cobertura_monitor_secas.csv"
 TABELA_QUALIDADE = config.OUT_TABELAS / "monitor_secas_revisoes_divergentes.csv"
 

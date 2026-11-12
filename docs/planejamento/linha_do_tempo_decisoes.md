@@ -5,7 +5,7 @@
 > foram avaliadas e **descartadas** em cada ponto; a **faixa inferior**, o que ficou para depois.
 >
 > Fontes: histórico de commits, [`Decisões e Justificativas do Projeto`](../Grupo1-Obsidian/Projeto%20Grupo%201%20-%20Preço%20dos%20Alimentos/00%20-%20Visão%20Geral/Decisões%20e%20Justificativas%20do%20Projeto.md),
-> [`analise_juncao_uf_mes.md`](analises/analise_juncao_uf_mes.md), [`analise_cobertura_safra_mt.md`](analises/analise_cobertura_safra_mt.md)
+> [`01_analise_juncao_uf_mes.md`](../analises/integracao_dados/01_analise_juncao_uf_mes.md), [`01_analise_cobertura_safra_mt.md`](../analises/safras_oferta/01_analise_cobertura_safra_mt.md)
 > e [`roteiro_simplificado.md`](apresentacao/roteiro_simplificado.md).
 
 ```mermaid
